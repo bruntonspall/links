@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3>Book</h3>
+
+<div class="btn-group">
+  <a href="/link/{{link.key.urlsafe()}}/edit" class="btn btn-primary btn-sm">
+    <i class="glyphicon glyphicon-edit"></i>
+    Edit link
+  </a>
+</div>
+
+<div>
+  <div>
+    <h4>{{link.title}}</h4>
+    <blockquote class="blockquote"><em>{{link.quote}}</em></blockquote>
+    <p>{{link.note}}</p>
+  </div>
+</div>
+
+{% endblock %}

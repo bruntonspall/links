@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block content %}
+<div class="row">
+<div class="col-sm-12">
+  {% if not newsletter.sent %}
+  <form action="/newsletter/{{newsletter.key.urlsafe()}}/send" method="POST">
+    {{macros.input("url", newsletter.url)}}
+    <button type="submit" class="btn btn-success">Mark as sent</button>
+  </form>
+  {% endif %}
+  <a href="/newsletter/{{newsletter.key.urlsafe()}}/edit" class="card-link">edit</a>
+</div>
+</div>
+<div class="row">
+  <div class="col-sm-12">
+    <h3>Cyberweekly #{{newsletter.number}} - {{newsletter.title}}</h3>
+    {% if newsletter.sent %}<small>Sent on {{newsletter.sent}}</small>{% endif %}
+    <p>{{newsletter.intro}}</p>
+  </div>
+</div>
+
+{% for link in links %}
+{{macros.link(link)}}
+{% else %}
+<p>No links found</p>
+{% endfor %}
+
+
+{% if not newsletter.sent %}
+<div class="row"><div class="col-sm-12">
+  <!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">See Raw Newsletter</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Raw Newsletter</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <textarea class="form-control" rows="20">
+          {% filter escape %}
+          <p>Welcome to CyberWeekly, a weekly roundup of news, articles, long form blog posts and various other miscellania that interests your author, Michael Brunton-Spall.</p>
+          <p>Feel free to forward this on to people you think might be interested.  If someone forwarded this to you, then you can subscribe to your own copy at <a href='https://tinyletter.com/cyberweekly'>Cyberweekly</a></p>
+          <p>Replies to this email come straight to me, so just hit reply to send me feedback, comments or links or tweet it to me <a href='https://twitter.com/bruntonspall'>@bruntonspall</a>. </p>
+          {% for link in links %}
+          <h3><a href="{{link.url}}">{{link.title}}</a></h3>
+          <blockquote><em>"{{link.quote}}"</em></blockquote>
+          <p>{{link.note_paras()|join('</p><p>')}}</p>
+          {% endfor %}
+          {% endfilter %}
+        </textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div></div>
+{% endif %}
+{% endblock %}
