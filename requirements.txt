@@ -3,3 +3,4 @@ requests
 requests-toolbelt
 requests_oauthlib
 python-twitter
+Flask-Markdown

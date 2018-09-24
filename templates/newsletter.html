@@ -17,7 +17,7 @@
   <div class="col-sm-12">
     <h3>Cyberweekly #{{newsletter.number}} - {{newsletter.title}}</h3>
     {% if newsletter.sent %}<small>Sent on {{newsletter.sent}}</small>{% endif %}
-    <p>{{newsletter.intro}}</p>
+    <p>{% if newsletter.intro %}{{newsletter.intro|markdown}}{% endif %}</p>
   </div>
 </div>
 
@@ -49,10 +49,11 @@
           <p>Welcome to CyberWeekly, a weekly roundup of news, articles, long form blog posts and various other miscellania that interests your author, Michael Brunton-Spall.</p>
           <p>Feel free to forward this on to people you think might be interested.  If someone forwarded this to you, then you can subscribe to your own copy at <a href='https://tinyletter.com/cyberweekly'>Cyberweekly</a></p>
           <p>Replies to this email come straight to me, so just hit reply to send me feedback, comments or links or tweet it to me <a href='https://twitter.com/bruntonspall'>@bruntonspall</a>. </p>
+          <em><p>{%if newsletter.intro %}{{newsletter.intro|markdown}}{% endif %}</p></em>
           {% for link in links %}
           <h3><a href="{{link.url}}">{{link.title}}</a></h3>
-          <blockquote><em>"{{link.quote}}"</em></blockquote>
-          <p>{{link.note_paras()|join('</p><p>')}}</p>
+          <blockquote><em>"{{link.quote|markdown}}"</em></blockquote>
+          <p>{{link.note|markdown}}</p>
           {% endfor %}
           {% endfilter %}
         </textarea>

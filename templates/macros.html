@@ -19,10 +19,10 @@
     <h5 class="card-title"><a href="{{link.url}}">{{link.title}}</a></h5>
     <h6 class="card-subtitle">{{link.url}}</h6>
     {% if link.quote %}
-    <blockquote class="card-text"><em>{{link.quote|truncate(100)}}</em></blockquote>
+    <blockquote class="card-text"><em>{{link.quote|truncate(100)|markdown}}</em></blockquote>
     {% endif %}
     {% if link.note %}
-    <p class="card-text">{{link.note|truncate(100)}}</p>
+    <p class="card-text">{{link.note|truncate(100)|markdown}}</p>
     {% endif %}
   </div>
   <div class="card-footer text-muted">
@@ -39,10 +39,10 @@
   <h5 class="card-title"><a href="{{link.url}}">{{link.title}}</a></h5>
   <h6 class="card-subtitle">{{link.url}}</h6>
   {% if link.quote %}
-  <blockquote class="card-text"><em>{{link.quote}}</em></blockquote>
+  <blockquote class="card-text"><em>{{link.quote|markdown}}</em></blockquote>
   {% endif %}
   {% if link.note %}
-  <p class="card-text">{{link.note}}</p>
+  <p class="card-text">{{link.note|markdown}}</p>
   {% endif %}
 </div>
 <div class="card-footer text-muted">
