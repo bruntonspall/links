@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 from models import Newsletter, Link, Settings
 from flask import Blueprint, redirect
-from datetime import date
+import json
 
 admin = Blueprint('admin', __name__)
 
@@ -23,4 +23,14 @@ def testdata():
     for link in Link.queued():
         link.newsletter = newsletter
         link.put()
-    return redirect('/')
+    return redirect('/admin/index')
+
+
+@admin.route('/export')
+def export():
+    data = []
+    for newsletter in Newsletter.list():
+        news = newsletter.to_json()
+        news['links'] = [link.to_json() for link in Link.by_newsletter(newsletter.key)]
+        data.append(news)
+    return json.dumps(data, indent=4)

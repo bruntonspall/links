@@ -19,13 +19,14 @@ def create_newsletter():
     for link in Link.queued():
         link.newsletter = newsletter
         link.put()
-    return redirect('/newsletter/{}'.format(newsletter.urlsafe()))
+    return redirect('/admin/newsletter/{}'.format(newsletter.urlsafe()))
 
 
 @newsletter.route('/<newsletterid>', methods=['GET'])
 def get_newsletter(newsletterid):
     newsletter = Newsletter.get(newsletterid)
     return render_template("newsletter.html", newsletter=newsletter, links=Link.by_newsletter(newsletter.key))
+
 
 @newsletter.route('/<newsletterid>/send', methods=['POST'])
 def send_newsletter(newsletterid):
@@ -37,7 +38,15 @@ def send_newsletter(newsletterid):
         link.type = Link.SENT
         link.put()
 
-    return redirect('/newsletter/{}'.format(newsletterid))
+    return redirect('/admin/newsletter/{}'.format(newsletterid))
+
+
+@newsletter.route('/<newsletterid>/delete', methods=['POST'])
+def delete_newsletter(newsletterid):
+    newsletter = Newsletter.get(newsletterid)
+    newsletter.key.delete()
+    return redirect('/admin/index'.format(newsletterid))
+
 
 @newsletter.route('/<newsletterid>/edit', methods=['GET', 'POST'])
 def edit_newsletter(newsletterid):
@@ -50,8 +59,9 @@ def edit_newsletter(newsletterid):
             else:
                 newsletter.sent = datetime.strptime(request.values.get('sent'), '%Y-%m-%d').date()
         newsletter.title = request.values.get('title')
+        newsletter.slugify()
         newsletter.intro = request.values.get('intro')
         newsletter.number = request.values.get('number')
         newsletter.put()
-        return redirect('/')
+        return redirect('/admin/index')
     return render_template('edit_newsletter.html', newsletter=newsletter)

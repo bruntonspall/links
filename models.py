@@ -1,4 +1,6 @@
 from google.appengine.ext import ndb
+from slugify import slugify
+
 
 class Newsletter(ndb.model.Model):
     stored = ndb.DateTimeProperty(auto_now_add=True)
@@ -8,6 +10,18 @@ class Newsletter(ndb.model.Model):
     intro = ndb.TextProperty()
     sent = ndb.DateProperty()
     number = ndb.StringProperty()
+    slug = ndb.StringProperty()
+
+    def to_json(self):
+        return {
+            'stored': self.stored.isoformat(),
+            'updated': self.updated.isoformat(),
+            'url': self.url,
+            'title': self.title,
+            'intro': self.intro,
+            'sent': self.sent.isoformat(),
+            'number': self.number
+        }
 
     @classmethod
     def list(cls):
@@ -18,13 +32,25 @@ class Newsletter(ndb.model.Model):
         return cls.query().order(-Newsletter.sent).order(-Newsletter.number).fetch()[0]
 
     @classmethod
+    def most_recent_published(cls):
+        return cls.query(Newsletter.sent != None).order(-Newsletter.sent).order(-Newsletter.number).fetch()[0]
+
+    @classmethod
     def by_number(cls, number):
         return cls.query(Newsletter.number == number).get()
+
+    @classmethod
+    def by_slug(cls, slug):
+        return cls.query(Newsletter.slug == slug).get()
 
     @classmethod
     def get(cls, key):
         return ndb.Key(urlsafe=key).get()
 
+    def slugify(self):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        return self.slug
 
 
 class Link(ndb.model.Model):
@@ -44,6 +70,18 @@ class Link(ndb.model.Model):
 
     def note_paras(self):
         return self.note.split('\n')
+
+    def to_json(self):
+        return {
+            'stored': self.stored.isoformat(),
+            'updated': self.updated.isoformat(),
+            'url': self.url,
+            'type': self.type,
+            'title': self.title,
+            'note': self.note,
+            'quote': self.quote,
+            'source': self.source
+        }
 
     @classmethod
     def get_by_url(cls, url):

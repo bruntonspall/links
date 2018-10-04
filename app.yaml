@@ -8,6 +8,8 @@ libraries:
     version: latest
 
 handlers:
+  - url: /admin/.*
+    script: admin.app
+    login: admin
   - url: /.*
     script: main.app
-    login: admin

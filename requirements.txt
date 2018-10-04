@@ -1,6 +1,8 @@
 Flask==0.12.2
+setuptools
 requests
 requests-toolbelt
 requests_oauthlib
 python-twitter
+python-slugify
 Flask-Markdown

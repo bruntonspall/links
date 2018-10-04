@@ -17,7 +17,7 @@ def edit_link(linkid):
         link.quote = request.form.get('quote', link.quote)
         link.note = request.form.get('note', link.note)
         link.put()
-        return redirect('/')
+        return redirect('/admin/index')
     return render_template("form.html", link=link)
 
 
@@ -26,7 +26,7 @@ def queue_link(linkid):
     link = Link.get(linkid)
     link.type = Link.QUEUED
     link.put()
-    return redirect('/')
+    return redirect('/admin/index')
 
 
 @links.route('/<linkid>/dequeue')
@@ -34,13 +34,13 @@ def dequeue_link(linkid):
     link = Link.get(linkid)
     link.type = Link.DRAFT
     link.put()
-    return redirect('/')
+    return redirect('/admin/index')
 
 
 @links.route('/<linkid>/delete')
 def delete_link(linkid):
     link = Link.delete(linkid)
-    return redirect('/')
+    return redirect('/admin/index')
 
 
 @links.route('/add', methods=['GET', 'POST'])
@@ -54,6 +54,6 @@ def add():
     link.note = request.values.get('note', link.note)
     if request.method == 'POST':
         link.put()
-        return redirect('/')
+        return redirect('/admin/index')
     else:
         return render_template('form.html', link=link)

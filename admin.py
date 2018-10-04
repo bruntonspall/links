@@ -18,19 +18,15 @@ requests_toolbelt.adapters.appengine.monkeypatch()
 app = Flask(__name__)
 Markdown(app)
 
-@app.route('/')
+app.register_blueprint(admin, url_prefix='/admin/admin')
+app.register_blueprint(newsletter, url_prefix='/admin/newsletter')
+app.register_blueprint(links, url_prefix='/admin/link')
+app.register_blueprint(fetch, url_prefix='/admin/fetch')
+
+
+@app.route('/admin/index')
 def index():
-    nl = Newsletter.most_recent_published()
-    return render_template("front.html", newsletter=nl, links=Link.by_newsletter(nl.key), newsletters=Newsletter.list())
-
-@app.route('/<newsletterslug>')
-def newsletter(newsletterslug):
-    nl = Newsletter.by_slug(newsletterslug)
-    if nl:
-        return render_template("front.html", newsletter=nl, links=Link.by_newsletter(nl.key), newsletters=Newsletter.list())
-    else:
-        return 'No such newsletter',404
-
+    return render_template("adminlist.html", newsletters=Newsletter.list(), queue=Link.queued(), links=Link.drafts().fetch())
 
 
 @app.errorhandler(500)

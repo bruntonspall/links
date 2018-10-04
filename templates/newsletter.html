@@ -5,12 +5,15 @@
 <div class="row">
 <div class="col-sm-12">
   {% if not newsletter.sent %}
-  <form action="/newsletter/{{newsletter.key.urlsafe()}}/send" method="POST">
+  <form action="/admin/newsletter/{{newsletter.key.urlsafe()}}/send" method="POST">
     {{macros.input("url", newsletter.url)}}
     <button type="submit" class="btn btn-success">Mark as sent</button>
   </form>
+  <form action="/admin/newsletter/{{newsletter.key.urlsafe()}}/delete" method="POST">
+    <button type="submit" class="btn btn-success">Delete</button>
+  </form>
   {% endif %}
-  <a href="/newsletter/{{newsletter.key.urlsafe()}}/edit" class="card-link">edit</a>
+  <a href="/admin/newsletter/{{newsletter.key.urlsafe()}}/edit" class="card-link">edit</a>
 </div>
 </div>
 <div class="row">

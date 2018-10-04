@@ -26,15 +26,15 @@
     {% endif %}
   </div>
   <div class="card-footer text-muted">
-    <a href="/link/{{link.key.urlsafe()}}/edit" class="card-link">Edit</a>
-    {% if link.type == 1 %}<a href="/link/{{link.key.urlsafe()}}/queue" class="card-link">Queue</a>{%endif%}
-    {% if link.type == 2 %}<a href="/link/{{link.key.urlsafe()}}/dequeue" class="card-link">Dequeue</a>{%endif%}
-    <a href="/link/{{link.key.urlsafe()}}/delete" class="card-link">Delete</a>
+    <a href="/admin/link/{{link.key.urlsafe()}}/edit" class="card-link">Edit</a>
+    {% if link.type == 1 %}<a href="/admin/link/{{link.key.urlsafe()}}/queue" class="card-link">Queue</a>{%endif%}
+    {% if link.type == 2 %}<a href="/admin/link/{{link.key.urlsafe()}}/dequeue" class="card-link">Dequeue</a>{%endif%}
+    <a href="/admin/link/{{link.key.urlsafe()}}/delete" class="card-link">Delete</a>
   </div>
 </div>
 {%- endmacro %}
 
-{%- macro link(link) -%}
+{%- macro link(link, edit=True) -%}
 <div class="card">
   <h5 class="card-title"><a href="{{link.url}}">{{link.title}}</a></h5>
   <h6 class="card-subtitle">{{link.url}}</h6>
@@ -45,7 +45,21 @@
   <p class="card-text">{{link.note|markdown}}</p>
   {% endif %}
 </div>
+{% if edit %}
 <div class="card-footer text-muted">
-  <a href="/link/{{link.key.urlsafe()}}/edit" class="card-link">Edit</a>
+  <a href="/admin/link/{{link.key.urlsafe()}}/edit" class="card-link">Edit</a>
 </div>
+{% endif %}
+{%- endmacro %}
+
+{%- macro displaylink(link) -%}
+<div class="">
+  <h5 class=""><a href="{{link.url}}">{{link.title}}</a></h5>
+  <h6 class="">{{link.url}}</h6>
+  {% if link.quote %}
+  <blockquote class=""><em>{{link.quote|markdown}}</em></blockquote>
+  {% endif %}
+  {{link.note|markdown}}
+</div>
+
 {%- endmacro %}
