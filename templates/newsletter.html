@@ -55,8 +55,8 @@
           <em><p>{%if newsletter.intro %}{{newsletter.intro|markdown}}{% endif %}</p></em>
           {% for link in links %}
           <h3><a href="{{link.url}}">{{link.title}}</a></h3>
-          <blockquote><em>"{{link.quote|markdown}}"</em></blockquote>
-          <p>{{link.note|markdown}}</p>
+          {%if link.quote %}<blockquote><em>"{{link.quote|markdown}}"</em></blockquote>{%endif%}
+          {%if link.note %}<p>{{link.note|markdown}}</p>{%endif%}
           {% endfor %}
           {% endfilter %}
         </textarea>
