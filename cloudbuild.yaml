@@ -1,5 +1,3 @@
 steps:
-- name: 'gcr.io/$PROJECT_ID/gcloud'
-  args: ['info']
-- name: 'gcr.io/$PROJECT_ID/gcloud'
+- name: 'gcr.io/cloud-builders/gcloud'
   args: ['app', 'deploy']
