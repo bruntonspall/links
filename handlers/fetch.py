@@ -4,6 +4,7 @@ import requests
 import logging
 import json
 import twitter
+import flask.json
 
 fetch = Blueprint('fetch', __name__)
 
@@ -33,7 +34,7 @@ def fetch_pinboard():
                 url=item['href'],
                 title=item['description'],
                 note=item['extended'],
-                type=1
+                type=0
                 ).put()
                 count += 1
         return 'Processed {} items'.format(count)
@@ -64,11 +65,10 @@ def fetch_twitter_favs():
                     if not Link.get_by_url(u.expanded_url):
                         Link(
                         url=u.expanded_url,
-                        source="Tweet https://twitter.com/{}/status/{}".format(fav.user.name, fav.id_str),
-                        type=1
+                        title=fav.text,
+                        note="Tweet: [https://twitter.com/{}/status{}]()".format(fav.user.screen_name, fav.id),
+                        type=0
                         ).put()
                         count += 1
-        Settings.set('TWITTER_LAST',favs[0].id_str)
-        return "{} new tweets".format(count)
-    else:
-        return "No new tweets"
+        Settings.set('TWITTER_LAST', favs[0].id_str)
+    return 'Processed {} items'.format(count)

@@ -21,6 +21,14 @@ def edit_link(linkid):
     return render_template("form.html", link=link)
 
 
+@links.route('/<linkid>/read')
+def read_link(linkid):
+    link = Link.get(linkid)
+    link.type = Link.DRAFT
+    link.put()
+    return redirect('/admin/index')
+
+
 @links.route('/<linkid>/queue')
 def queue_link(linkid):
     link = Link.get(linkid)
@@ -43,17 +51,26 @@ def delete_link(linkid):
     return redirect('/admin/index')
 
 
-@links.route('/add', methods=['GET', 'POST'])
-def add():
+@links.route('/add', methods=['GET'])
+def add_get():
     url = request.values.get('url')
     link = Link.get_by_url(url)
     if link == None:
-        link = Link(url=url, type=Link.DRAFT)
-    link.title = request.values.get('title', link.title)
-    link.quote = request.values.get('quote', link.quote)
-    link.note = request.values.get('note', link.note)
-    if request.method == 'POST':
-        link.put()
-        return redirect('/admin/index')
-    else:
-        return render_template('form.html', link=link)
+        link = Link(url=url, type=Link.TOREAD)
+    link.title = request.args.get('title', link.title)
+    link.quote = request.args.get('quote', link.quote)
+    link.note = request.args.get('note', link.note)
+    return render_template('form.html', link=link)
+
+
+@links.route('/add', methods=['POST'])
+def add_post():
+    url = request.form.get('url')
+    link = Link.get_by_url(url)
+    if link == None:
+        link = Link(url=url, type=Link.TOREAD)
+    link.title = request.form.get('title', link.title)
+    link.quote = request.form.get('quote', link.quote)
+    link.note = request.form.get('note', link.note)
+    link.put()
+    return redirect('/admin/index')

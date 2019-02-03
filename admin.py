@@ -26,7 +26,7 @@ app.register_blueprint(fetch, url_prefix='/admin/fetch')
 
 @app.route('/admin/index')
 def index():
-    return render_template("adminlist.html", newsletters=Newsletter.list(), queue=Link.queued(), links=Link.drafts().fetch())
+    return render_template("adminlist.html", newsletters=Newsletter.list(), queue=Link.queued(), links=Link.drafts().fetch(), readinglist=Link.toread())
 
 
 @app.errorhandler(500)

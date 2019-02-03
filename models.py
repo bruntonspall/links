@@ -54,9 +54,11 @@ class Newsletter(ndb.model.Model):
 
 
 class Link(ndb.model.Model):
+    TOREAD = 0
     DRAFT = 1
     QUEUED = 2
     SENT = 3
+    DELETED = 4
 
     stored = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
@@ -93,7 +95,14 @@ class Link(ndb.model.Model):
 
     @classmethod
     def delete(cls, key):
-        return ndb.Key(urlsafe=key).delete()
+        link = ndb.Key(urlsafe=key).get()
+        link.type = Link.DELETED
+        link.put()
+        return None
+
+    @classmethod
+    def toread(cls):
+        return cls.query(Link.type == cls.TOREAD).order(-Link.updated)
 
     @classmethod
     def drafts(cls):
