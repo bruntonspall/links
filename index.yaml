@@ -14,7 +14,17 @@ indexes:
   properties:
   - name: newsletter
   - name: updated
+
+- kind: Link
+  properties:
+  - name: newsletter
+  - name: updated
     direction: desc
+
+- kind: Link
+  properties:
+  - name: type
+  - name: updated
 
 - kind: Link
   properties:

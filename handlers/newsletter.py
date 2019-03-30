@@ -16,7 +16,7 @@ def create_newsletter():
         if old:
             number = str(int(old.number)+1)
     newsletter = Newsletter(number=number).put()
-    for link in Link.queued():
+    for link in Link.queued_in_reverse():
         link.newsletter = newsletter
         link.put()
     return redirect('/admin/newsletter/{}'.format(newsletter.urlsafe()))
@@ -34,7 +34,7 @@ def send_newsletter(newsletterid):
     newsletter.url = request.values.get('url')
     newsletter.sent = date.today()
     newsletter.put()
-    for link in Link.by_newsletter(newsletter.key):
+    for link in Link.by_newsletter_in_reverse(newsletter.key):
         link.type = Link.SENT
         link.put()
 

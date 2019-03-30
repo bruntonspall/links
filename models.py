@@ -113,9 +113,16 @@ class Link(ndb.model.Model):
         return cls.query(Link.type == cls.QUEUED).order(-Link.updated)
 
     @classmethod
+    def queued_in_reverse(cls):
+        return cls.query(Link.type == cls.QUEUED).order(Link.updated)
+
+    @classmethod
     def by_newsletter(cls, newsletter):
         return cls.query(Link.newsletter == newsletter).order(-Link.updated)
 
+    @classmethod
+    def by_newsletter_in_reverse(cls, newsletter):
+        return cls.query(Link.newsletter == newsletter).order(Link.updated)
 
 class Settings(ndb.Model):
     name = ndb.StringProperty()
