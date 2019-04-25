@@ -28,6 +28,11 @@ indexes:
 
 - kind: Link
   properties:
+  - name: newsletter
+  - name: updated
+
+- kind: Link
+  properties:
   - name: type
   - name: updated
     direction: desc
