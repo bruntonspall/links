@@ -24,7 +24,7 @@ app.register_blueprint(newsletter, url_prefix='/admin/newsletter')
 app.register_blueprint(links, url_prefix='/admin/link')
 app.register_blueprint(fetch, url_prefix='/admin/fetch')
 
-USERS = ["michael@brunton-spall.co.uk", "test@example.com"]
+USERS = ["michael@brunton-spall.co.uk", "test@example.com", "joel@slash32.co.uk"]
 
 @app.before_request
 def check_user():
@@ -36,7 +36,11 @@ def check_user():
 
 @app.route('/admin/index')
 def index():
-    return render_template("adminlist.html", newsletters=Newsletter.list(), queue=Link.queued(), links=Link.drafts().fetch(), readinglist=Link.toread())
+    return render_template("adminlist.html", newsletters=Newsletter.list(), queue=Link.queued(), links=Link.drafts().fetch())
+
+@app.route('/admin/readinglist')
+def reading():
+    return render_template("readinglist.html", newsletters=Newsletter.list(), readinglist=Link.toread())
 
 
 @app.errorhandler(500)
