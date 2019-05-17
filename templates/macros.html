@@ -28,6 +28,7 @@
   <div class="card-footer text-muted">
     <a href="/admin/link/{{link.key.urlsafe()}}/edit" class="card-link">Edit</a>
     {% if link.type == 0 %}<a href="/admin/link/{{link.key.urlsafe()}}/read" class="card-link">Read</a>{%endif%}
+    {% if link.type == 1 %}<a href="/admin/link/{{link.key.urlsafe()}}/unread" class="card-link">Unread</a>{%endif%}
     {% if link.type == 1 %}<a href="/admin/link/{{link.key.urlsafe()}}/queue" class="card-link">Queue</a>{%endif%}
     {% if link.type == 2 %}<a href="/admin/link/{{link.key.urlsafe()}}/dequeue" class="card-link">Dequeue</a>{%endif%}
     <a href="/admin/link/{{link.key.urlsafe()}}/delete" class="card-link">Delete</a>

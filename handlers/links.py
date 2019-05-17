@@ -26,6 +26,14 @@ def read_link(linkid):
     link = Link.get(linkid)
     link.type = Link.DRAFT
     link.put()
+    return redirect('/admin/readinglist')
+
+
+@links.route('/<linkid>/unread')
+def read_link(linkid):
+    link = Link.get(linkid)
+    link.type = Link.TOREAD
+    link.put()
     return redirect('/admin/index')
 
 
