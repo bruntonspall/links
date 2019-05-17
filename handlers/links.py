@@ -30,7 +30,7 @@ def read_link(linkid):
 
 
 @links.route('/<linkid>/unread')
-def read_link(linkid):
+def unread_link(linkid):
     link = Link.get(linkid)
     link.type = Link.TOREAD
     link.put()
