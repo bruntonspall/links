@@ -3,6 +3,11 @@
 {% block content %}
 <h3>{{action}} link</h3>
 
+{% if link.newsletter %}
+{% set newsletter = link.newsletter.get()%}
+<p>Seen in <a href="/{{newsletter.slugify()}}">{{newsletter.number}} - {{newsletter.title}}</a></p>
+{% endif %}
+
 <form method="POST" enctype="multipart/form-data">
 
   <div class="form-group">
