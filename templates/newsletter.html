@@ -49,10 +49,10 @@
           <p>Welcome to CyberWeekly, a weekly roundup of news, articles, long form blog posts and various other miscellania that interests your author, Michael Brunton-Spall.</p>
           <p>Feel free to forward this on to people you think might be interested.  If someone forwarded this to you, then you can subscribe to your own copy at <a href='https://tinyletter.com/cyberweekly'>Cyberweekly</a></p>
           <p>Replies to this email come straight to me, so just hit reply to send me feedback, comments or links or tweet it to me <a href='https://twitter.com/bruntonspall'>@bruntonspall</a>. </p>
-          <em><p>{%if newsletter.intro %}{{newsletter.intro|markdown}}{% endif %}</p></em>
+          {%if newsletter.intro %}<p>{{newsletter.intro|markdown}}</p>{% endif %}
           {% for link in links %}
           <h3><a href="{{link.url}}">{{link.title}}</a></h3>
-          {%if link.quote %}<blockquote><em>{{link.quote|markdown}}</em></blockquote>{%endif%}
+          {%if link.quote %}<blockquote>{{link.quote|markdown}}</blockquote>{%endif%}
           {%if link.note %}<p>{{link.note|markdown}}</p>{%endif%}
           {% endfor %}
           <p>Thanks for reading</p>
