@@ -81,4 +81,16 @@ def add_post():
     link.quote = request.form.get('quote', link.quote)
     link.note = request.form.get('note', link.note)
     link.put()
-    return redirect('/admin/index')
+    return render_template('form.html', link=link)
+
+@links.route('/quickadd', methods=['GET'])
+def quickadd_get():
+    url = request.values.get('url')
+    link = Link.get_by_url(url)
+    if link == None:
+        link = Link(url=url, type=Link.TOREAD)
+    link.title = request.args.get('title', link.title)
+    link.quote = request.args.get('quote', link.quote)
+    link.put()
+
+    return render_template('form.html', link=link)
