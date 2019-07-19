@@ -4,7 +4,7 @@
 <script type="text/javascript">
   function closeSelf (f) {
      f.submit();
-     window.close();
+     setTimeout(function(){window.close();}, 3000);
   }
 </script>
 <h3>{{action}} link</h3>
