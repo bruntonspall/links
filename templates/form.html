@@ -1,12 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-<script type="text/javascript">
-  function closeSelf (f) {
-     f.submit();
-     setTimeout(function(){window.close();}, 3000);
-  }
-</script>
 <h3>{{action}} link</h3>
 
 {% if link.newsletter %}
@@ -14,7 +8,7 @@
 <p>Seen in <a href="/{{newsletter.slugify()}}">{{newsletter.number}} - {{newsletter.title}}</a></p>
 {% endif %}
 
-<form method="POST" enctype="multipart/form-data" onsubmit="closeSelf(this)">
+<form method="POST" enctype="multipart/form-data">
 
   <div class="form-group">
     <label for="title">URL</label>
