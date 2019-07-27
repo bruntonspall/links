@@ -106,11 +106,11 @@ class Link(ndb.model.Model):
 
     @classmethod
     def drafts(cls):
-        return cls.query(Link.type == cls.DRAFT).order(-Link.updated)
+        return cls.query(Link.type == cls.DRAFT).order(-Link.updated).fetch()
 
     @classmethod
     def queued(cls):
-        return cls.query(Link.type == cls.QUEUED).order(-Link.updated)
+        return cls.query(Link.type == cls.QUEUED).order(-Link.updated).fetch()
 
     @classmethod
     def queued_in_reverse(cls):

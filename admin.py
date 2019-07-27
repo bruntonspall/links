@@ -36,7 +36,7 @@ def check_user():
 
 @app.route('/admin/index')
 def index():
-    return render_template("adminlist.html", newsletters=Newsletter.list(), queue=Link.queued(), links=Link.drafts().fetch())
+    return render_template("adminlist.html", newsletters=Newsletter.list(), queue=Link.queued(), links=Link.drafts())
 
 @app.route('/admin/readinglist')
 def reading():
