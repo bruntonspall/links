@@ -24,7 +24,7 @@ app.register_blueprint(newsletter, url_prefix='/admin/newsletter')
 app.register_blueprint(links, url_prefix='/admin/link')
 app.register_blueprint(fetch, url_prefix='/admin/fetch')
 
-USERS = ["michael@brunton-spall.co.uk", "test@example.com", "joel@slash32.co.uk", "michael@bruntonspall.com"]
+USERS = ["michael@brunton-spall.co.uk", "test@example.com", "joel@slash32.co.uk", "michael@bruntonspall.com", "jonathan.lawrence@digital.justice.gov.uk"]
 
 @app.before_request
 def check_user():
