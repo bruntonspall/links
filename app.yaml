@@ -10,6 +10,5 @@ libraries:
 handlers:
   - url: /admin/.*
     script: admin.app
-    login: required
   - url: /.*
     script: main.app

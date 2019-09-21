@@ -20,7 +20,8 @@ class Newsletter(ndb.model.Model):
             'title': self.title,
             'intro': self.intro,
             'sent': self.sent.isoformat(),
-            'number': self.number
+            'number': self.number,
+            'slug': self.slug
         }
 
     @classmethod

@@ -14,6 +14,8 @@ from handlers.fetch import fetch
 
 from google.appengine.api import users
 
+from auth import login_required, check_user
+
 requests_toolbelt.adapters.appengine.monkeypatch()
 
 app = Flask(__name__)
@@ -24,21 +26,15 @@ app.register_blueprint(newsletter, url_prefix='/admin/newsletter')
 app.register_blueprint(links, url_prefix='/admin/link')
 app.register_blueprint(fetch, url_prefix='/admin/fetch')
 
-USERS = ["michael@brunton-spall.co.uk", "test@example.com", "joel@slash32.co.uk", "michael@bruntonspall.com", "jonathan.lawrence@digital.justice.gov.uk"]
-
-@app.before_request
-def check_user():
-    user = users.get_current_user()
-    g.logout_url = users.create_logout_url('/')
-    if user.nickname() not in USERS:
-        return "User {} is frobidden from accessing this page, <a href='{}'>logout</a>".format(user.nickname(), g.logout_url), 403
 
 
 @app.route('/admin/index')
+@login_required
 def index():
     return render_template("adminlist.html", newsletters=Newsletter.list(), queue=Link.queued(), links=Link.drafts())
 
 @app.route('/admin/readinglist')
+@login_required
 def reading():
     return render_template("readinglist.html", newsletters=Newsletter.list(), readinglist=Link.toread())
 

@@ -1,10 +1,13 @@
 from flask import request, render_template, redirect, url_for, Blueprint
 from models import Newsletter, Link, Settings
 from datetime import date, datetime
+from auth import check_user
 import logging
 
 
 newsletter = Blueprint('newsletter', __name__)
+newsletter.before_request(check_user)
+
 
 @newsletter.route('/create', methods=['POST'])
 def create_newsletter():
