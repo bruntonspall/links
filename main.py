@@ -17,14 +17,14 @@ Markdown(app)
 @app.route('/')
 def index():
     nl = Newsletter.most_recent_published()
-    return render_template("front.html", newsletter=nl, links=Link.by_newsletter(nl.key), newsletters=Newsletter.list())
+    return render_template("front/index.html", newsletter=nl, links=Link.by_newsletter(nl.key), newsletters=Newsletter.list())
 
 
 @app.route('/<newsletterslug>')
 def newsletter(newsletterslug):
     nl = Newsletter.by_slug(newsletterslug)
     if nl:
-        return render_template("front.html", newsletter=nl, links=Link.by_newsletter(nl.key), newsletters=Newsletter.list())
+        return render_template("front/index.html", newsletter=nl, links=Link.by_newsletter(nl.key), newsletters=Newsletter.list())
     else:
         return 'No such newsletter', 404
 
