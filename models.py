@@ -49,6 +49,8 @@ class Newsletter(ndb.model.Model):
         return ndb.Key(urlsafe=key).get()
 
     def slugify(self):
+        if not self.title:
+            return "untitled"
         if not self.slug:
             self.slug = slugify(self.title)
         return self.slug
