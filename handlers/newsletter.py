@@ -66,5 +66,5 @@ def edit_newsletter(newsletterid):
         newsletter.intro = request.values.get('intro')
         newsletter.number = request.values.get('number')
         newsletter.put()
-        return redirect('/admin/index')
+        return redirect('/admin/newsletter/{}'.format(newsletterid))
     return render_template('edit_newsletter.html', newsletter=newsletter)
