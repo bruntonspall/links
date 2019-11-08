@@ -19,6 +19,8 @@ def edit_link(linkid):
         link.title = request.form.get('title', link.title)
         link.quote = request.form.get('quote', link.quote)
         link.note = request.form.get('note', link.note)
+        link.url = request.form.get('url', link.title)
+
         link.put()
         return redirect('/admin/index')
     return render_template("form.html", link=link)
