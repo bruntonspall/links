@@ -16,16 +16,16 @@
 <div class="row">
   <h3>Reading List</h3>
 </div>
-<div class="row">
   {% for row in readinglist|batch(3) %}
-  <div class="card-group">
+  <div class="row mb-1">
+    <div class="card-deck">
     {% for link in row %}
-      {{ macros.linkcard(link) }}
+      {{ macros.link(link) }}
     {% endfor %}
   </div>
+</div>
   {% else %}
   <p>No links found</p>
   {% endfor %}
-</div>
 
 {% endblock %}

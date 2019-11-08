@@ -17,7 +17,7 @@
   <div class="col-6">
       <h3>Draft - {{links|length}}</h3>
       {% for link in links %}
-          {{ macros.linkcard(link) }}
+          {{ macros.link(link) }}
       {% else %}
       <p>No links found</p>
       {% endfor %}
@@ -25,7 +25,7 @@
   <div class="col-6">
       <h3>Queued - {{queue|length}}</h3>
       {% for link in queue %}
-        {{ macros.linkcard(link) }}
+        {{ macros.link(link) }}
       {% else %}
         <p>No links found</p>
       {% endfor %}          
