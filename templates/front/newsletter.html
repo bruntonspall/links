@@ -1,0 +1,25 @@
+{% extends "front/base.html" %}
+{% import "macros.html" as macros %}
+
+{% block content %}
+<div class="row">
+  <div class="col-sm-8">
+    <h3>Cyberweekly #{{newsletter.number}} - {{newsletter.title}}</h3>
+    {% if newsletter.sent %}<small>Sent on {{newsletter.sent}}</small>{% endif %}
+    <p>{% if newsletter.intro %}{{newsletter.intro|markdown}}{% endif %}</p>
+    {% for link in links %}
+    {{macros.displaylink(link)}}
+    {% else %}
+    <p>No links found</p>
+    {% endfor %}
+  </div>
+  <div class="col-sm-4">
+    <h2>Previous Editions</h2>
+    <ul>
+{% for newsletter in newsletters %}
+<li><a href="/{{newsletter.slugify()}}">{{ newsletter.number }} - {{newsletter.title}}</a></li>
+{% endfor %}
+</ul>
+  </div>
+</div>
+{% endblock %}

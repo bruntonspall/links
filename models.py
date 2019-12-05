@@ -29,6 +29,10 @@ class Newsletter(ndb.model.Model):
         return cls.query().order(-Newsletter.sent).order(-Newsletter.number)
 
     @classmethod
+    def list_published(cls):
+        return cls.query(Newsletter.sent != None).order(-Newsletter.sent).order(-Newsletter.number)
+
+    @classmethod
     def most_recent(cls):
         return cls.query().order(-Newsletter.sent).order(-Newsletter.number).fetch()[0]
 

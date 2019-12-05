@@ -3,23 +3,33 @@
 
 {% block content %}
 <div class="row">
-  <div class="col-sm-8">
-    <h3>Cyberweekly #{{newsletter.number}} - {{newsletter.title}}</h3>
-    {% if newsletter.sent %}<small>Sent on {{newsletter.sent}}</small>{% endif %}
-    <p>{% if newsletter.intro %}{{newsletter.intro|markdown}}{% endif %}</p>
-    {% for link in links %}
-    {{macros.displaylink(link)}}
-    {% else %}
-    <p>No links found</p>
-    {% endfor %}
+  <div class="jumbotron">
+    <h1 class="display-4">Cyberweekly</h1>
+    <p class="lead">A weekly roundup of interesting content from across the web that is of interest to people working in cyber security. Generally long form articles and blog posts, as well as links to outages, incidents and security bugs that you might find interesting. Presented with a small amount of editorial comment</p>
+    <hr class="my-4">
+    <p class="lead">
+      <form action="https://tinyletter.com/CyberWeekly" method="post" target="popupwindow" onsubmit="window.open('https://tinyletter.com/CyberWeekly', 'popupwindow', 'scrollbars=yes,width=800,height=600');return true">
+        <div class="form-group">
+          <label for="tlemail">Enter your email address to subscribe</label>
+          <input type="email" class="form-control" name="email" id="tlemail" placeholder="Enter email"/>
+          <input type="hidden" value="1" name="embed"/>
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary" value="Subscribe">Subscribe</button>
+        </div>
+      </form>         
+      <small class="form-text text-muted"><a href="https://tinyletter.com" target="_blank">powered by TinyLetter</a></small>
+    </p>
   </div>
-  <div class="col-sm-4">
-    <h2>Previous Editions</h2>
-    <ul>
-{% for newsletter in newsletters %}
-<li><a href="/{{newsletter.slugify()}}">{{ newsletter.number }} - {{newsletter.title}}</a></li>
-{% endfor %}
-</ul>
+</div>
+<h2>Previous Editions</h2>
+<div class="row">
+  <div class="col">
+    <ul class="list-unstyled">
+      {% for newsletter in newsletters %}
+      <li><a href="/{{newsletter.slugify()}}">{{ newsletter.number }} - {{newsletter.title}}</a></li>
+      {% endfor %}
+    </ul>
   </div>
 </div>
 {% endblock %}
