@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-from models import Newsletter, Link, Settings
+from models import *
 from flask import Blueprint, redirect, request
 import json
 import logging 
@@ -116,3 +116,30 @@ def imp():
             ).put()
 
     return "OK"
+
+@admin.route('/convert', methods=['POST'])
+def dataconvert():
+    for newsletter in Newsletter.list():
+        nd = NewsletterDraft(
+            id = int(newsletter.number),
+            stored = newsletter.stored,
+            updated = newsletter.updated,
+            sent = newsletter.sent,
+            url = newsletter.url,
+            title = newsletter.title,
+            intro = newsletter.intro,
+            slug = newsletter.slug)
+        nd.put()
+        i = 1
+        for link in Link.by_newsletter(newsletter.key):
+            PlacementDraft(
+                id = i,
+                updated = link.updated,
+                title = link.title,
+                quote = link.quote,
+                note = link.note,
+                url = link.url,
+                newsletter = nd.key
+            ).put()
+            i += 1
+        nd.launch()

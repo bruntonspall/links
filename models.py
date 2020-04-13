@@ -60,6 +60,146 @@ class Newsletter(ndb.model.Model):
         return self.slug
 
 
+class NewsletterDraft(ndb.model.Model):
+    id = ndb.IntegerProperty()
+    stored = ndb.DateTimeProperty(auto_now_add=True)
+    updated = ndb.DateTimeProperty(auto_now=True)
+    sent = ndb.DateProperty()
+    url = ndb.StringProperty()
+    title = ndb.StringProperty()
+    intro = ndb.TextProperty()
+    slug = ndb.StringProperty()
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'stored': self.stored.isoformat(),
+            'updated': self.updated.isoformat(),
+            'sent': self.sent.isoformat(),
+            'url': self.url,
+            'title': self.title,
+            'intro': self.intro,
+            'slug': self.slug
+        }
+
+    @classmethod
+    def list(cls):
+        return cls.query().order(-cls.id)
+
+    @classmethod
+    def list_published(cls):
+        return None
+
+    @classmethod
+    def most_recent(cls):
+        return cls.query().order(-cls.number).fetch()[0]
+
+    @classmethod
+    def by_number(cls, id):
+        return cls.query(cls.id == id).get()
+
+    @classmethod
+    def by_slug(cls, slug):
+        return cls.query(cls.slug == slug).get()
+
+    @classmethod
+    def get(cls, key):
+        return ndb.Key(urlsafe=key).get()
+
+    def slugify(self):
+        if not self.title:
+            return "untitled"
+        if not self.slug:
+            self.slug = slugify(self.title)
+        return self.slug
+    
+    def add_placement(self, placement):
+        id = len(placement.__class__.query(placement.__class__.newsletter == self.key).fetch())+1
+        placement.newsletter = self.key
+        placement.id = id
+        placement.put()
+
+    def placements(self):
+        return PlacementDraft.query(PlacementDraft.newsletter == self.key).order(-PlacementDraft.updated).fetch()
+
+    def launch(self):
+        newsletter = NewsletterLive.by_number(self.id)
+        if not newsletter:
+            newsletter = NewsletterLive()
+        newsletter.id=self.id 
+        newsletter.url=self.url
+        newsletter.title=self.title
+        newsletter.intro=self.intro
+        newsletter.slug=self.slug
+        newsletter.sent=self.sent
+        newsletter.updated=self.updated
+        newsletter.put()
+        for placement in PlacementDraft.query(PlacementDraft.newsletter == self.key).order(PlacementDraft.updated):
+            placement.launch(newsletter)
+        return newsletter
+
+        
+
+
+
+class NewsletterLive(ndb.model.Model):
+    id = ndb.IntegerProperty()
+    stored = ndb.DateTimeProperty(auto_now_add=True)
+    updated = ndb.DateTimeProperty(auto_now=True)
+    sent = ndb.DateProperty()
+    url = ndb.StringProperty()
+    title = ndb.StringProperty()
+    intro = ndb.TextProperty()
+    slug = ndb.StringProperty()
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'stored': self.stored.isoformat(),
+            'updated': self.updated.isoformat(),
+            'sent': self.sent.isoformat(),
+            'url': self.url,
+            'title': self.title,
+            'intro': self.intro,
+            'slug': self.slug
+        }
+
+    @classmethod
+    def list(cls):
+        return cls.query().order(-cls.id)
+
+    @classmethod
+    def list_published(cls):
+        return None
+
+    @classmethod
+    def most_recent(cls):
+        return cls.query().order(-cls.number).fetch()[0]
+
+    @classmethod
+    def by_number(cls, id):
+        return cls.query(cls.id == id).get()
+
+    @classmethod
+    def by_slug(cls, slug):
+        return cls.query(cls.slug == slug).get()
+
+    @classmethod
+    def get(cls, key):
+        return ndb.Key(urlsafe=key).get()
+
+    def slugify(self):
+        if not self.title:
+            return "untitled"
+        if not self.slug:
+            self.slug = slugify(self.title)
+        return self.slug
+
+    def placements(self):
+        return PlacementLive.query(PlacementLive.newsletter == self.key).order(-PlacementLive.updated).fetch()
+
+
+
 class Link(ndb.model.Model):
     TOREAD = 0
     DRAFT = 1
@@ -109,7 +249,7 @@ class Link(ndb.model.Model):
 
     @classmethod
     def toread(cls):
-        return cls.query(Link.type == cls.TOREAD).order(-Link.updated)
+        return cls.query(Link.type == cls.TOREAD).order(-Link.updated).fetch()
 
     @classmethod
     def drafts(cls):
@@ -130,6 +270,124 @@ class Link(ndb.model.Model):
     @classmethod
     def by_newsletter_in_reverse(cls, newsletter):
         return cls.query(Link.newsletter == newsletter).order(Link.updated)
+
+class PlacementLive(ndb.model.Model):
+    id = ndb.IntegerProperty()
+    updated = ndb.DateTimeProperty(auto_now=True)
+    title = ndb.StringProperty()
+    quote = ndb.TextProperty()
+    note = ndb.TextProperty()
+    url = ndb.StringProperty(required=True)
+    order = ndb.IntegerProperty()
+    newsletter = ndb.KeyProperty(kind=NewsletterLive)
+
+    def note_paras(self):
+        return self.note.split('\n')
+
+    def to_json(self):
+        return {
+            'order':self.order,
+            'updated': self.updated.isoformat(),
+            'title': self.title,
+            'quote': self.quote,
+            'note': self.note,
+            'url': self.url,
+        }
+
+    @classmethod
+    def get_by_newsletter_id(cls, newsletter, id):
+        return cls.query(cls.newsletter == newsletter).filter(cls.id == id).get()
+
+    @classmethod
+    def get(cls, key):
+        return ndb.Key(urlsafe=key).get()
+
+    @classmethod
+    def delete(cls, key):
+        link = ndb.Key(urlsafe=key).get()
+        link.delete()
+        return None
+
+    @classmethod
+    def by_newsletter(cls, newsletter):
+        return cls.query(cls.newsletter == newsletter).order(cls.order)
+
+    @classmethod
+    def by_newsletter_in_reverse(cls, newsletter):
+        return cls.query(cls.newsletter == newsletter).order(-cls.order)
+
+class PlacementDraft(ndb.model.Model):
+    id = ndb.IntegerProperty()
+    updated = ndb.DateTimeProperty(auto_now=True)
+    title = ndb.StringProperty()
+    quote = ndb.TextProperty()
+    note = ndb.TextProperty()
+    url = ndb.StringProperty(required=True)
+    order = ndb.IntegerProperty()
+    newsletter = ndb.KeyProperty(kind=NewsletterDraft)
+
+    def note_paras(self):
+        return self.note.split('\n')
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'order':self.order,
+            'updated': self.updated.isoformat(),
+            'title': self.title,
+            'quote': self.quote,
+            'note': self.note,
+            'url': self.url,
+        }
+
+    @classmethod
+    def get_by_url(cls, url):
+        return cls.query(cls.url == url).get()
+
+    @classmethod
+    def get(cls, key):
+        return ndb.Key(urlsafe=key).get()
+
+    @classmethod
+    def delete(cls, key):
+        link = ndb.Key(urlsafe=key).get()
+        link.delete()
+        return None
+
+    @classmethod
+    def by_newsletter(cls, newsletter):
+        return cls.query(cls.newsletter == newsletter).order(cls.order)
+
+    @classmethod
+    def by_newsletter_in_reverse(cls, newsletter):
+        return cls.query(cls.newsletter == newsletter).order(-cls.order)
+
+    @classmethod
+    def from_link(cls, link):
+        placement = cls(
+            # No order yet
+            title = link.title,
+            quote = link.quote,
+            note = link.note,
+            url = link.url
+        )
+        placement.put()
+        return placement
+    
+    def launch(self, livenewsletter):
+        placement = PlacementLive.get_by_newsletter_id(livenewsletter.key, self.id)
+        if not placement:
+            placement = PlacementLive()
+        placement.id=self.id
+        placement.order=self.order
+        placement.title=self.title
+        placement.quote=self.quote
+        placement.note=self.note
+        placement.url=self.url
+        placement.updated=self.updated
+        placement.newsletter=livenewsletter.key
+        placement.put()
+        return placement
 
 class Settings(ndb.Model):
     name = ndb.StringProperty()
