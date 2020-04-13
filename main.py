@@ -24,7 +24,7 @@ def index():
 def newsletter(newsletterslug):
     nl = Newsletter.by_slug(newsletterslug)
     if nl:
-        return render_template("front/newsletter.html", newsletter=nl, links=Link.by_newsletter(nl.key), newsletters=Newsletter.list())
+        return render_template("front/newsletter.html", newsletter=nl, links=Link.by_newsletter(nl.key), newsletters=Newsletter.list_published())
     else:
         return 'No such newsletter', 404
 
