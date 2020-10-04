@@ -119,7 +119,13 @@ def imp():
 
 @admin.route('/convert', methods=['POST'])
 def dataconvert():
-    for newsletter in Newsletter.list():
+    if len(Newsletter.query(Newsletter.version < 2).fetch(1)) == 0:
+        # Newsletters are version 0, so add version indicator to them all
+        for newsletter in Newsletter.list():
+            newsletter.put()
+        return "Newsletters updated to version 1"  
+    count = 0  
+    for newsletter in Newsletter.query(Newsletter.version == 1).fetch(25):
         nd = NewsletterDraft(
             id = int(newsletter.number),
             stored = newsletter.stored,
@@ -130,6 +136,7 @@ def dataconvert():
             intro = newsletter.intro,
             slug = newsletter.slug)
         nd.put()
+        logging.info(u"Create newsletter {} - {}".format(nd.id, nd.title))
         i = 1
         for link in Link.by_newsletter(newsletter.key):
             PlacementDraft(
@@ -142,4 +149,10 @@ def dataconvert():
                 newsletter = nd.key
             ).put()
             i += 1
+            logging.info(u"Create link {}".format(link.title))
+
         nd.launch()
+        newsletter.version =2
+        newsletter.put()
+        count += 1
+    return "{} Newsletters converted".format(count)

@@ -2,7 +2,7 @@
 import logging
 
 from flask import Flask
-from models import Newsletter, Link, Settings
+from models import *
 from flask import request, render_template, redirect, url_for, g
 from flaskext.markdown import Markdown
 import requests_toolbelt.adapters.appengine
@@ -31,12 +31,12 @@ app.register_blueprint(fetch, url_prefix='/admin/fetch')
 @app.route('/admin/index')
 @login_required
 def index():
-    return render_template("adminlist.html", newsletters=Newsletter.list(), queue=Link.queued(), links=Link.drafts())
+    return render_template("adminlist.html", newsletters=NewsletterDraft.list(), queue=Link.queued(), links=Link.drafts())
 
 @app.route('/admin/readinglist')
 @login_required
 def reading():
-    return render_template("readinglist.html", newsletters=Newsletter.list(), readinglist=Link.toread())
+    return render_template("readinglist.html", newsletters=NewsletterDraft.list(), readinglist=Link.toread())
 
 
 @app.errorhandler(500)

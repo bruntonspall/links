@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 from flask import request, render_template, redirect, url_for, Blueprint
-from models import Newsletter, Link, Settings
+from models import *
 from auth import check_user
 
 links = Blueprint('links', __name__)
@@ -47,7 +47,7 @@ def queue_link(linkid):
     link = Link.get(linkid)
     link.type = Link.QUEUED
     link.put()
-    return redirect('/admin/index')
+    return redirect('/admin/readinglist')
 
 
 @links.route('/<linkid>/dequeue')
@@ -73,7 +73,7 @@ def add_get():
     link.title = request.args.get('title', link.title)
     link.quote = request.args.get('quote', link.quote)
     link.note = request.args.get('note', link.note)
-    return render_template('form.html', link=link)
+    return render_template('form.html', link=link, placements=PlacementDraft.get_by_url(url))
 
 
 @links.route('/add', methods=['POST'])

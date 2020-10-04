@@ -2,7 +2,7 @@
 import logging
 
 from flask import Flask
-from models import Newsletter, Link
+from models import *
 from flask import render_template
 from flaskext.markdown import Markdown
 import requests_toolbelt.adapters.appengine
@@ -16,15 +16,15 @@ Markdown(app)
 
 @app.route('/')
 def index():
-    nl = Newsletter.most_recent_published()
-    return render_template("front/index.html", newsletter=Newsletter.most_recent_published(), newsletters=Newsletter.list_published())
+    nl = NewsletterLive.most_recent()
+    return render_template("front/index.html", newsletter=NewsletterLive.most_recent(), newsletters=NewsletterLive.list_published())
 
 
 @app.route('/<newsletterslug>')
 def newsletter(newsletterslug):
-    nl = Newsletter.by_slug(newsletterslug)
+    nl = NewsletterLive.by_slug(newsletterslug)
     if nl:
-        return render_template("front/newsletter.html", newsletter=nl, links=Link.by_newsletter(nl.key), newsletters=Newsletter.list_published())
+        return render_template("front/newsletter.html", newsletter=nl, links=nl.placements(), newsletters=NewsletterLive.list_published())
     else:
         return 'No such newsletter', 404
 

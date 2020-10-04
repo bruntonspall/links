@@ -4,7 +4,7 @@
 {% block content %}
 <div class="row">
   <div class="col-sm-8">
-    <h3>Cyberweekly #{{newsletter.number}} - {{newsletter.title}}</h3>
+    <h3>Cyberweekly #{{newsletter.id}} - {{newsletter.title}}</h3>
     {% if newsletter.sent %}<small>Sent on {{newsletter.sent}}</small>{% endif %}
     <p>{% if newsletter.intro %}{{newsletter.intro|markdown}}{% endif %}</p>
     {% for link in links %}
@@ -17,7 +17,7 @@
     <h2>Previous Editions</h2>
     <ul class="list-unstyled">
 {% for newsletter in newsletters %}
-<li><a href="/{{newsletter.slugify()}}">{{ newsletter.number }} - {{newsletter.title}}</a></li>
+<li><a href="/{{newsletter.slugify()}}">{{ newsletter.id }} - {{newsletter.title}}</a></li>
 {% endfor %}
 </ul>
   </div>

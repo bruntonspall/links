@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "adminlist.html" %}
 {% import "macros.html" as macros %}
 
 {% block content %}
@@ -8,16 +8,23 @@
     {{macros.input("url", newsletter.url)}}
     <button type="submit" class="btn btn-success">Mark as sent</button>
   </form>
+  {% if newsletter.live_newsletter %}
+  <form action="/admin/newsletter/{{newsletter.key.urlsafe()}}/takedown" method="POST">
+    <button type="submit" class="btn btn-warning">Takedown</button>
+  </form>
+  {% endif %}
   <form action="/admin/newsletter/{{newsletter.key.urlsafe()}}/delete" method="POST">
-    <button type="submit" class="btn btn-success">Delete</button>
+    <button type="submit" class="btn btn-danger">Delete</button>
   </form>
   <a href="/admin/newsletter/{{newsletter.key.urlsafe()}}/edit" class="btn btn-success">edit</a>
 </div>
 </div>
 <div class="row">
   <div class="col-sm-12">
-    <h3>Cyberweekly #{{newsletter.number}} - {{newsletter.title}}</h3>
-    {% if newsletter.sent %}<small>Sent on {{newsletter.sent}}</small>{% endif %}
+    <h3>Cyberweekly #{{newsletter.id}} - {{newsletter.title}}</h3>
+    {% if newsletter.sent %}<small>Sent on {{newsletter.sent}}</small><br>{% endif %}
+    {% if newsletter.dirty %}There are unlaunched changes<br>{% endif %}
+    {% if newsletter.live_newsletter %}<small>Live at <a href="/{{newsletter.live_newsletter.get().slug}}">{{newsletter.live_newsletter.get().slug}}</a></small>{% endif %}
     <p>{% if newsletter.intro %}{{newsletter.intro|markdown}}{% endif %}</p>
   </div>
 </div>

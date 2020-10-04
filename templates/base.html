@@ -18,7 +18,16 @@
       <li class="nav-item">
         <a class="nav-link" href="/admin/readinglist">Reading List</a>
       </li>
-      {% block nav %}{% endblock %}
+      {% block nav %}
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Newsletters</a>
+        <div class="dropdown-menu">
+          {% for newsletter in newsletters %}
+          <a class="dropdown-item" href="/admin/newsletter/{{newsletter.key.urlsafe()}}">{% if newsletter.dirty%}* {%endif%}{% if not newsletter.live_newsletter%}DRAFT {%endif%}{{newsletter.id}} - {{newsletter.title}}</a>
+          {% endfor %}
+        </div>
+      </li>
+            {% endblock %}
     </nav>
     <div class="container">
       {% block content %}{% endblock %}

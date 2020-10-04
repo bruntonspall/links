@@ -27,7 +27,7 @@
   <div class="col">
     <ul class="list-unstyled">
       {% for newsletter in newsletters %}
-      <li><a href="/{{newsletter.slugify()}}">{{ newsletter.number }} - {{newsletter.title}}</a></li>
+      <li><a href="/{{newsletter.slugify()}}">{{ newsletter.id }} - {{newsletter.title}}</a></li>
       {% endfor %}
     </ul>
   </div>

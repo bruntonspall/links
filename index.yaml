@@ -28,11 +28,6 @@ indexes:
 
 - kind: Link
   properties:
-  - name: newsletter
-  - name: updated
-
-- kind: Link
-  properties:
   - name: type
   - name: updated
     direction: desc
@@ -42,4 +37,21 @@ indexes:
   - name: sent
     direction: desc
   - name: number
+    direction: desc
+
+- kind: PlacementDraft
+  properties:
+  - name: newsletter
+  - name: updated
+
+- kind: PlacementDraft
+  properties:
+  - name: newsletter
+  - name: updated
+    direction: desc
+
+- kind: PlacementLive
+  properties:
+  - name: newsletter
+  - name: updated
     direction: desc

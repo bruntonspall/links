@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "adminlist.html" %}
 {% import "macros.html" as macros %}
 
 {% block content %}
@@ -8,7 +8,7 @@
 
     {{macros.input("title", newsletter.title)}}
     {{macros.textarea("intro", newsletter.intro)}}
-    {{macros.input("number", newsletter.number)}}
+    {{macros.input("id", newsletter.id)}}
     {{macros.input("sent", newsletter.sent, 'date')}}
     {{macros.input("url", newsletter.url)}}
 
