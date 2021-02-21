@@ -163,7 +163,7 @@ class Link:
     @staticmethod
     def from_dict(source):
         l = Link(url=source['url'], type=source['type'],title=source['title'],note=source['note'],quote=source['quote'],source=source['source'])
-        l.key = source.get('key', uuid.uuid4())
+        l.key = source.get('key', str(uuid.uuid4()))
         l.stored = source['stored']
         l.updated = source['updated']
         l.newsletter = source.get('newsletter', None)
