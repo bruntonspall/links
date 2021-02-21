@@ -67,6 +67,7 @@ def imp():
             nl['sent'] = True
 
         n = Newsletter.from_dict(nl)
+        n.body = nl['intro']
         n.slugify()
         n.save()
         key = n.key()
