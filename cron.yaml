@@ -1,7 +1,0 @@
-cron:
-- description: "twitter scan"
-  url: /admin/fetch/twitter
-  schedule: every 4 hours
-- description: "pinboard scan"
-  url: /admin/fetch/pinboard
-  schedule: every 4 hours

@@ -1,15 +1,16 @@
-FROM python:3.7.2-slim-stretch as build
+FROM python:3.7 as build
 
-COPY . /links
+COPY . .
+RUN pip install -r requirements.txt
+RUN pip install -r requirements-dev.txt
 
-RUN pip install /links
+# RUN pytest .
 
-FROM python:3.7.2-slim-stretch
+FROM python:3.7-slim
+COPY --from=build app /app
+COPY --from=build requirements.txt /app
 
-# Copy python dependencies and spatialite libraries
-COPY --from=build /usr/local/lib/ /usr/local/lib/
-# Copy executables
-COPY --from=build /usr/local/bin /usr/local/bin
-
-EXPOSE 8001
-CMD ["links"]
+WORKDIR /app
+RUN pip install -r requirements.txt
+EXPOSE 8080
+CMD ["python", "main.py"]

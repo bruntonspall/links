@@ -1,0 +1,2 @@
+#!/bin/sh
+docker run -p 8080:8080 -e GOOGLE_APPLICATION_CREDENTIALS=/config -e LOCALDB=1 -v $GOOGLE_APPLICATION_CREDENTIALS:/config links
