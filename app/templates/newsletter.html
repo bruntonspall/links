@@ -44,44 +44,18 @@
         </button>
       </div>
       <div class="modal-body">
-        <textarea class="form-control" rows="20">
-          {% filter escape %}
-          <style type="text/css">blockquote {
-            margin: 0;
-        }
-        .blockquote {
-        margin: 0.5em;
-        margin-left: 2em;
-            background: #eee;
-            border-radius: 5px;
-            font-style: normal!important;
-        }
-        .blockquote>p {
-            font-style: normal!important;
-        padding: 0.2em 1em;
-        }
-        
-        .blockquote p:first-child:before {
-            content: '\201C';
-        }
-        
-        .blockquote p:last-child:after {
-            content: '\201D';
-        }
-        </style>
           <p>Welcome to CyberWeekly, a weekly roundup of news, articles, long form blog posts and various other miscellania that interests your author, Michael Brunton-Spall.</p>
           <p>Feel free to forward this on to people you think might be interested.  If someone forwarded this to you, then you can subscribe to your own copy at <a href='https://tinyletter.com/cyberweekly'>Cyberweekly</a></p>
           <p>Replies to this email come straight to me, so just hit reply to send me feedback, comments or links or tweet it to me <a href='https://twitter.com/bruntonspall'>@bruntonspall</a>. </p>
           {%if newsletter.body %}<p>{{newsletter.body|markdown}}</p>{% endif %}
           {% for link in links %}
+          <hr/>
           <h3><a href="{{link.url}}">{{link.title}}</a></h3>
-          {%if link.quote %}<div class=blockquote>{{link.quote|markdown}}</div>{%endif%}
+          {%if link.quote %}<blockquote>{{link.quote|markdown}}</blockquote>{%endif%}
           {%if link.note %}<div class=note>{{link.note|markdown}}</div>{%endif%}
           {% endfor %}
           <p>Thanks for reading</p>
           <p>Michael</p>
-          {% endfilter %}
-        </textarea>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
