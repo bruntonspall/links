@@ -7,9 +7,9 @@
     <form method="POST" enctype="multipart/form-data">
 
     {{macros.input("title", newsletter.title)}}
-    {{macros.textarea("intro", newsletter.intro)}}
+    {{macros.textarea("body", newsletter.body)}}
     {{macros.input("number", newsletter.number)}}
-    {{macros.input("sent", newsletter.sent, 'date')}}
+    {{macros.input("sent", newsletter.sentdate, 'date')}}
     {{macros.input("url", newsletter.url)}}
 
       <button type="submit" class="btn btn-success">Save</button>

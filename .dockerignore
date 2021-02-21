@@ -1,0 +1,16 @@
+*.md
+*.pyc
+*.pyo
+.git/
+.gitignore
+__pycache__
+.DS_Store
+.cache
+.eggs
+.ipynb_checkpoints
+build
+*.spec
+*.egg-info
+dist
+scratchpad
+venv

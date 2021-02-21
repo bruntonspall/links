@@ -1,5 +1,4 @@
 from functools import wraps
-from google.appengine.api import users
 from flask import redirect, request, g, request
 
 USERS = ["michael@brunton-spall.co.uk", "test@example.com", "joel@slash32.co.uk", "michael@bruntonspall.com", "jonathan.lawrence@digital.justice.gov.uk"]

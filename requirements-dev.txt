@@ -6,4 +6,4 @@ pytest-cov==2.5.1
 retrying==1.3.3
 nose
 nose-exclude
-nosegae
+mock-firestore

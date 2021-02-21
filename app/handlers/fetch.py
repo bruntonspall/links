@@ -8,7 +8,6 @@ import flask.json
 from auth import check_user
 
 fetch = Blueprint('fetch', __name__)
-fetch.before_request(check_user)
 
 
 @fetch.route('/pinboard')
