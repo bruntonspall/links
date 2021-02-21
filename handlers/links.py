@@ -2,9 +2,9 @@
 from flask import request, render_template, redirect, url_for, Blueprint
 from models import Newsletter, Link, Settings
 from auth import check_user
+import logging
 
 links = Blueprint('links', __name__)
-links.before_request(check_user)
 
 
 @links.route('/<linkid>')
@@ -14,6 +14,7 @@ def show_link(linkid):
 
 @links.route('/<linkid>/edit', methods=['GET', 'POST'])
 def edit_link(linkid):
+    logging.info(f"Getting link {linkid}")
     link = Link.get(linkid)
     if request.method == 'POST':
         link.title = request.form.get('title', link.title)
@@ -21,7 +22,7 @@ def edit_link(linkid):
         link.note = request.form.get('note', link.note)
         link.url = request.form.get('url', link.title)
 
-        link.put()
+        link.save()
         return redirect('/admin/index')
     return render_template("form.html", link=link)
 
@@ -30,7 +31,7 @@ def edit_link(linkid):
 def read_link(linkid):
     link = Link.get(linkid)
     link.type = Link.DRAFT
-    link.put()
+    link.save()
     return redirect('/admin/readinglist')
 
 
@@ -38,7 +39,7 @@ def read_link(linkid):
 def unread_link(linkid):
     link = Link.get(linkid)
     link.type = Link.TOREAD
-    link.put()
+    link.save()
     return redirect('/admin/index')
 
 
@@ -46,7 +47,7 @@ def unread_link(linkid):
 def queue_link(linkid):
     link = Link.get(linkid)
     link.type = Link.QUEUED
-    link.put()
+    link.save()
     return redirect('/admin/index')
 
 
@@ -54,7 +55,7 @@ def queue_link(linkid):
 def dequeue_link(linkid):
     link = Link.get(linkid)
     link.type = Link.DRAFT
-    link.put()
+    link.save()
     return redirect('/admin/index')
 
 
@@ -85,7 +86,7 @@ def add_post():
     link.title = request.form.get('title', link.title)
     link.quote = request.form.get('quote', link.quote)
     link.note = request.form.get('note', link.note)
-    link.put()
+    link.save()
     return render_template('form.html', link=link)
 
 @links.route('/quickadd', methods=['GET'])
@@ -96,6 +97,6 @@ def quickadd_get():
         link = Link(url=url, type=Link.TOREAD)
     link.title = request.args.get('title', link.title)
     link.quote = request.args.get('quote', link.quote)
-    link.put()
+    link.save()
 
     return render_template('form.html', link=link)

@@ -7,3 +7,4 @@ python-twitter
 python-slugify
 Flask-Markdown
 python-dateutil
+google-cloud-firestore

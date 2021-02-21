@@ -6,7 +6,7 @@
   <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Newsletters</a>
   <div class="dropdown-menu">
     {% for newsletter in newsletters %}
-    <a class="dropdown-item" href="/admin/newsletter/{{newsletter.key.urlsafe()}}">{{newsletter.number}} - {{newsletter.title}}</a>
+    <a class="dropdown-item" href="/admin/newsletter/{{newsletter.key}}">{{newsletter.number}} - {{newsletter.title}}</a>
     {% endfor %}
   </div>
 </li>

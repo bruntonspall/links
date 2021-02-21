@@ -18,7 +18,7 @@
   <ul class="list-group">
     {% for newsletter in newsletters %}
     <li class="list-group-item">
-      <a href="/admin/newsletter/{{newsletter.key.urlsafe()}}"><h4>{{newsletter.number}} - {{newsletter.title}}</h4></a>
+      <a href="/admin/newsletter/{{newsletter.number}}"><h4>{{newsletter.number}} - {{newsletter.title}}</h4></a>
     </li>
     {% else %}
     <p>No links found</p>
