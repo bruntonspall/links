@@ -1,7 +1,10 @@
 steps:
-- name: 'python'
-  args: ['pip', 'install',  '-r', 'requirements.txt', '-t', 'lib']
-- name: 'gcr.io/cloud-builders/gcloud'
-  args: ['app', 'deploy', 'index.yaml']
-- name: 'gcr.io/cloud-builders/gcloud'
-  args: ['app', 'deploy']
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'build', '-t', 'gcr.io/cyberweekly/cyberweekly', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/cyberweekly/cyberweekly']
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args: ['run', 'deploy', 'cyberweekly', '--image', 'gcr.io/cyberweekly/cyberweekly', '--region', 'europe-west1', '--platform', 'managed']
+images:
+- gcr.io/cyberweekly/cyberweekly
