@@ -36,6 +36,8 @@ from oauthlib.oauth2 import WebApplicationClient
 # Configuration
 GOOGLE_CLIENT_ID = os.environ.get("OAUTH_CLIENTID", None)
 GOOGLE_CLIENT_SECRET = os.environ.get("OAUTH_CLIENTSECRET", None)
+GOOGLE_CALLBACK = os.environ.get("OAUTH_CALLBACK", "https://www.cyberweekly.net/login/callback")
+
 GOOGLE_DISCOVERY_URL = (
     "https://accounts.google.com/.well-known/openid-configuration"
 )
@@ -70,10 +72,10 @@ def login():
     # scopes that let you retrieve user's profile from Google
     request_uri = client.prepare_request_uri(
         authorization_endpoint,
-        redirect_uri=request.base_url + "/callback",
+        redirect_uri=GOOGLE_CALLBACK,
         scope=["openid", "email"],
     )
-    logging.info(f"Redirecting to {request_uri}")
+    logging.warning(f"Redirecting to {request_uri}")
     return redirect(request_uri)
 
 @app.route("/login/callback")
