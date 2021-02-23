@@ -86,11 +86,14 @@ def callback():
     # things on behalf of a user
     google_provider_cfg = get_google_provider_cfg()
     token_endpoint = google_provider_cfg["token_endpoint"]
+    # Hack to replace http:// with https:// in request.url and request.base_url
+    url = request.url.replace('http://', 'https://')
+    base_url = request.base_url.replace('http://', 'https://')
     # Prepare and send a request to get tokens! Yay tokens!
     token_url, headers, body = client.prepare_token_request(
         token_endpoint,
-        authorization_response=request.url,
-        redirect_url=request.base_url,
+        authorization_response=url,
+        redirect_url=base_url,
         code=code
     )
     token_response = requests.post(
