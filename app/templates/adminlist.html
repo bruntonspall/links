@@ -1,16 +1,7 @@
 {% extends "base.html" %}
 {% import "macros.html" as macros %}
 
-{% block nav %}
-<li class="nav-item dropdown">
-  <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Newsletters</a>
-  <div class="dropdown-menu">
-    {% for newsletter in newsletters %}
-    <a class="dropdown-item" href="/admin/newsletter/{{newsletter.number}}">{{newsletter.number}} - {{newsletter.title}}</a>
-    {% endfor %}
-  </div>
-</li>
-{% endblock %}
+
 {% block content %}
 
 <div class="row">

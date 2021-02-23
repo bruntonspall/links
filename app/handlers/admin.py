@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 from models import Newsletter, Link, Settings
 from flask import Blueprint, redirect, request
+from flask_login import login_required
 import json
 import logging 
 from dateutil import parser
@@ -16,6 +17,7 @@ def json_serial(obj):
     raise TypeError ("Type %s not serializable" % type(obj))
 
 @admin.route('/testdata')
+@login_required
 def testdata():
     link = Link(url='http://www.iso27001security.com/html/27000.html',
                 type=Link.DRAFT,

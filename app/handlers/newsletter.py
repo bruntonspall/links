@@ -1,7 +1,7 @@
 from flask import request, render_template, redirect, url_for, Blueprint
 from models import Newsletter, Link, Settings
 from datetime import date, datetime
-from auth import check_user
+from flask_login import login_required
 import logging
 
 
@@ -9,6 +9,7 @@ newsletter = Blueprint('newsletter', __name__)
 
 
 @newsletter.route('/create', methods=['POST'])
+@login_required
 def create_newsletter():
     if request.values.get('number'):
         number = request.values.get('number')
@@ -26,12 +27,14 @@ def create_newsletter():
 
 
 @newsletter.route('/<newsletterid>', methods=['GET'])
+@login_required
 def get_newsletter(newsletterid):
     newsletter = Newsletter.get(newsletterid)
     return render_template("newsletter.html", newsletter=newsletter, links=Link.by_newsletter(newsletter.key()))
 
 
 @newsletter.route('/<newsletterid>/send', methods=['POST'])
+@login_required
 def send_newsletter(newsletterid):
     newsletter = Newsletter.get(newsletterid)
     newsletter.url = request.values.get('url')
@@ -46,6 +49,7 @@ def send_newsletter(newsletterid):
 
 
 @newsletter.route('/<newsletterid>/delete', methods=['POST'])
+@login_required
 def delete_newsletter(newsletterid):
     newsletter = Newsletter.get(newsletterid)
     newsletter.key.delete()
@@ -53,6 +57,7 @@ def delete_newsletter(newsletterid):
 
 
 @newsletter.route('/<newsletterid>/edit', methods=['GET', 'POST'])
+@login_required
 def edit_newsletter(newsletterid):
     newsletter = Newsletter.get(newsletterid)
     if request.method == 'POST':

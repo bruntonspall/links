@@ -1,18 +1,20 @@
 # -*- coding: UTF-8 -*-
 from flask import request, render_template, redirect, url_for, Blueprint
 from models import Newsletter, Link, Settings
-from auth import check_user
+from flask_login import login_required
 import logging
 
 links = Blueprint('links', __name__)
 
 
 @links.route('/<linkid>')
+@login_required
 def show_link(linkid):
     link = Link.get(linkid)
     return render_template("view.html", link=link)
 
 @links.route('/<linkid>/edit', methods=['GET', 'POST'])
+@login_required
 def edit_link(linkid):
     logging.info(f"Getting link {linkid}")
     link = Link.get(linkid)
@@ -28,6 +30,7 @@ def edit_link(linkid):
 
 
 @links.route('/<linkid>/read')
+@login_required
 def read_link(linkid):
     link = Link.get(linkid)
     link.type = Link.DRAFT
@@ -36,6 +39,7 @@ def read_link(linkid):
 
 
 @links.route('/<linkid>/unread')
+@login_required
 def unread_link(linkid):
     link = Link.get(linkid)
     link.type = Link.TOREAD
@@ -44,6 +48,7 @@ def unread_link(linkid):
 
 
 @links.route('/<linkid>/queue')
+@login_required
 def queue_link(linkid):
     link = Link.get(linkid)
     link.type = Link.QUEUED
@@ -52,6 +57,7 @@ def queue_link(linkid):
 
 
 @links.route('/<linkid>/dequeue')
+@login_required
 def dequeue_link(linkid):
     link = Link.get(linkid)
     link.type = Link.DRAFT
@@ -60,12 +66,14 @@ def dequeue_link(linkid):
 
 
 @links.route('/<linkid>/delete')
+@login_required
 def delete_link(linkid):
     link = Link.delete(linkid)
     return redirect('/admin/index')
 
 
 @links.route('/add', methods=['GET'])
+@login_required
 def add_get():
     url = request.values.get('url')
     link = Link.get_by_url(url)
@@ -78,6 +86,7 @@ def add_get():
 
 
 @links.route('/add', methods=['POST'])
+@login_required
 def add_post():
     url = request.form.get('url')
     link = Link.get_by_url(url)
@@ -90,6 +99,7 @@ def add_post():
     return render_template('form.html', link=link)
 
 @links.route('/quickadd', methods=['GET'])
+@login_required
 def quickadd_get():
     url = request.values.get('url')
     link = Link.get_by_url(url)

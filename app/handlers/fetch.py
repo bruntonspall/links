@@ -5,7 +5,6 @@ import logging
 import json
 import twitter
 import flask.json
-from auth import check_user
 
 fetch = Blueprint('fetch', __name__)
 

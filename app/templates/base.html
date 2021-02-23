@@ -11,14 +11,31 @@
     </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand" href="/admin/index">Cyber Weekly: {{g.user}}</a>
-      <li class="nav-item">
-        <a class="nav-link" href="/admin/link/add">Add Item</a>
+      <a class="navbar-brand" href="/admin/index">Cyber Weekly: {{current_user.name}} <img height=40 src="{{current_user.picture}}"/></a>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/link/add">Add Item</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/readinglist">Reading List</a>
+          </li>
+          {% block nav %}
+      {% if newsletters %}
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Newsletters</a>
+        <div class="dropdown-menu">
+          {% for newsletter in newsletters %}
+          <a class="dropdown-item" href="/admin/newsletter/{{newsletter.key()}}">{{newsletter.number}} - {{newsletter.title}}</a>
+          {% endfor %}
+        </div>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/admin/readinglist">Reading List</a>
-      </li>
-      {% block nav %}{% endblock %}
+      {%endif%}
+      {% if current_user.is_authenticated %}<li class="nav-item dropdown"><a class="nav-link" href="/logout">Logout</a></li>{% endif %}
+      {% endblock %}
+        </ul>
+      </div>
+      
     </nav>
     <div class="container">
       {% block content %}{% endblock %}

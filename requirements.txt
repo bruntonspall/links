@@ -9,3 +9,4 @@ Flask-Markdown
 python-dateutil
 google-cloud-firestore
 mock-firestore
+Flask-Login
