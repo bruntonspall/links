@@ -151,6 +151,19 @@ class LinkTestCase(DatabaseTestCase):
         self.assertEquals("http://foo.com/draft1", Link.drafts()[0].url)
         self.assertEquals("http://foo.com/queued1", Link.queued()[0].url)
 
+    def testGetLinksNewsletter(self):
+        n = Newsletter("Newsletter 1", "Some text")
+        n.number = 1
+        n.stored = datetime.fromisoformat("2020-03-07 13:00")
+        n.updated = datetime.fromisoformat("2020-03-07 13:00")
+        n.sent = True
+        n.sentdate = datetime.fromisoformat("2020-03-07 13:00")
+        n.slugify()
+        n.save()
+        l = Link(url="http://foo.com/toread1", type=Link.TOREAD, newsletter=n.key())
+
+        self.assertEquals(l.get_newsletter().to_dict(), n.to_dict())
+
 
 
 class SettingTestCase(DatabaseTestCase):

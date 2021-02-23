@@ -4,7 +4,7 @@
 <h3>{{action}} link</h3>
 
 {% if link.newsletter %}
-{% set newsletter = link.newsletter.get()%}
+{% set newsletter = link.get_newsletter()%}
 <p>Seen in <a href="/{{newsletter.slugify()}}">{{newsletter.number}} - {{newsletter.title}}</a></p>
 {% endif %}
 

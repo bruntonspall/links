@@ -253,6 +253,9 @@ class Link:
     def by_newsletter_in_reverse(newsletter):
         return [Link.from_dict(d.to_dict()) for d in Link.query().where("newsletter", "==", newsletter).order_by("updated").stream()]
 
+    def get_newsletter(self):
+        return Newsletter.get(self.newsletter)
+
 
 class Settings:
     collection = u"settings"
