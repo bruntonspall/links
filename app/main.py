@@ -119,8 +119,8 @@ def callback():
     if userinfo_response.json().get("email_verified"):
         unique_id = userinfo_response.json()["sub"]
         users_email = userinfo_response.json()["email"]
-        picture = userinfo_response.json()["picture"]
-        users_name = userinfo_response.json()["given_name"]
+        picture = userinfo_response.json().get("picture", None)
+        users_name = userinfo_response.json().get("given_name", users_email)
     else:
         return "User email not available or not verified by Google.", 400
 
