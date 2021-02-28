@@ -39,7 +39,7 @@ def send_newsletter(newsletterid):
     newsletter = Newsletter.get(newsletterid)
     newsletter.url = request.values.get('url')
     newsletter.sent = True
-    newsletter.sentdate = date.today()
+    newsletter.sentdate = datetime.now()
     newsletter.save()
     for link in Link.by_newsletter_in_reverse(newsletter.key()):
         link.type = Link.SENT
