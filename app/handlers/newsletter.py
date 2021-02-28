@@ -52,7 +52,7 @@ def send_newsletter(newsletterid):
 @login_required
 def delete_newsletter(newsletterid):
     newsletter = Newsletter.get(newsletterid)
-    newsletter.key.delete()
+    newsletter.delete()
     return redirect('/admin/index')
 
 

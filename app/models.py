@@ -86,6 +86,13 @@ class Newsletter:
     def key(self):
         return str(self.number)
 
+    def delete(self):
+        for link in Link.by_newsletter(self.key()):
+            link.newsletter = None
+            link.save()
+        Database.db.collection(Newsletter.collection).document(self.key()).delete()
+        
+
     @staticmethod
     def first(query):
         docs = query.limit(1).stream()
