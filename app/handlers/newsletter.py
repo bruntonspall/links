@@ -61,7 +61,6 @@ def delete_newsletter(newsletterid):
 def edit_newsletter(newsletterid):
     newsletter = Newsletter.get(newsletterid)
     if request.method == 'POST':
-        logging.error("Edit with values {}".format(request.values))
         newsletter.title = request.values.get('title')
         newsletter.slugify()
         newsletter.body = request.values.get('body')
@@ -72,7 +71,7 @@ def edit_newsletter(newsletterid):
             if not newsletter.sent:
                 return send_newsletter(newsletterid)
             else:
-                newsletter.sentdate = datetime.strptime(request.values.get('sent'), '%Y-%m-%d').date()
+                newsletter.sentdate = datetime.strptime(request.values.get('sent'), '%Y-%m-%d')
                 newsletter.save()
         return redirect('/admin/newsletter/{}'.format(newsletterid))
     return render_template('edit_newsletter.html', newsletter=newsletter)
