@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-from models import Newsletter, Link, Settings
+from models import Newsletter, Link, Settings, Database
 from flask import Blueprint, redirect, request
 from flask_login import login_required
 import json
@@ -90,4 +90,14 @@ def imp():
         link = Link.from_dict(l)
         link.save()
 
+    return "OK"
+
+
+@admin.route('/migrate', methods=['POST'])
+def migrate():
+    for newsletter in Database.db.collection(Newsletter.collection).stream():
+        d = newsletter.to_dict()
+        if isinstance(d['stored'], str):
+            stored = datetime.fromisoformat(d['stored'])
+            Database.db.collection(Newsletter.collection).document(newsletter.id).update({'stored': stored})
     return "OK"

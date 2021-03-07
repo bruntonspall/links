@@ -1,4 +1,4 @@
-Flask==0.12.2
+Flask
 setuptools
 requests
 requests-toolbelt

@@ -17,7 +17,7 @@
 <div class="row">
   <div class="col-sm-12">
     <h3>Cyberweekly #{{newsletter.number}} - {{newsletter.title}}</h3>
-    {% if newsletter.sent %}<small>Sent on {{newsletter.sentdate}}</small>{% endif %}
+    {% if newsletter.sent %}<small>Sent on {{newsletter.sentdate.date()}}</small>{% endif %}
     <p>{% if newsletter.body %}{{newsletter.body|markdown}}{% endif %}</p>
   </div>
 </div>
@@ -44,9 +44,15 @@
         </button>
       </div>
       <div class="modal-body">
-          <p>Welcome to CyberWeekly, a weekly roundup of news, articles, long form blog posts and various other miscellania that interests your author, Michael Brunton-Spall.</p>
-          <p>Feel free to forward this on to people you think might be interested.  If someone forwarded this to you, then you can subscribe to your own copy at <a href='https://tinyletter.com/cyberweekly'>Cyberweekly</a></p>
-          <p>Replies to this email come straight to me, so just hit reply to send me feedback, comments or links or tweet it to me <a href='https://twitter.com/bruntonspall'>@bruntonspall</a>. </p>
+        Welcome to CyberWeekly, a weekly roundup of news, articles, long form blog posts and various other miscellania that interests your author, Michael Brunton-Spall.
+
+        Feel free to forward this on to people you think might be interested. 
+        
+        If someone forwarded this to you, then you can subscribe to get email updates
+        
+        Replies to this email come straight to me, so just hit reply to send me feedback, comments or links or tweet it to me @bruntonspall.  You can also comment on substack: 
+        
+        
           {%if newsletter.body %}<p>{{newsletter.body|markdown}}</p>{% endif %}
           {% for link in links %}
           <hr/>

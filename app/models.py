@@ -8,8 +8,10 @@ import uuid
 class Database:
     db = firestore.Client()
 
+
 class User(UserMixin):
     collection = "Users"
+
     def __init__(self, id_, email, name, picture):
         self.id = id_
         self.email = email
@@ -30,13 +32,14 @@ class User(UserMixin):
     @staticmethod
     def create(id_, email, name, picture):
         userdict = {
-            'id':id_,
-            'email':email,
-            'name':name,
-            'picture':picture
+            'id': id_,
+            'email': email,
+            'name': name,
+            'picture': picture
         }
         Database.db.collection(User.collection).document(id_).set(userdict)
         return User.from_dict(userdict)
+
 
 class Newsletter:
     collection = u"newsletters"
@@ -55,14 +58,17 @@ class Newsletter:
     @staticmethod
     def from_dict(source):
         n = Newsletter(number=source['number'])
-        n.title=source.get('title', None)
-        n.body=source.get('body', None)
-        n.slug=source.get('slug', None)
-        n.sent=source.get('sent', None)
+        n.title = source.get('title', None)
+        n.body = source.get('body', None)
+        n.slug = source.get('slug', None)
+        n.sent = source.get('sent', None)
         n.stored = source.get('stored', None)
         n.updated = source.get('updated', None)
         if 'sentdate' in source:
-            n.sentdate = source['sentdate']
+            if isinstance(source['sentdate'], str):
+                n.sentdate = datetime.fromisoformat(source['sentdate'])
+            else:
+                n.sentdate = source['sentdate']
         return n
 
     def to_dict(self):
@@ -91,7 +97,6 @@ class Newsletter:
             link.newsletter = None
             link.save()
         Database.db.collection(Newsletter.collection).document(self.key()).delete()
-        
 
     @staticmethod
     def first(query):
@@ -199,12 +204,12 @@ class Link:
 
     @staticmethod
     def from_dict(source):
-        l = Link(url=source['url'], type=source['type'],title=source['title'],note=source['note'],quote=source['quote'],source=source['source'])
-        l.key = source.get('key', str(uuid.uuid4()))
-        l.stored = source['stored']
-        l.updated = source['updated']
-        l.newsletter = source.get('newsletter', None)
-        return l
+        link = Link(url=source['url'], type=source['type'], title=source['title'], note=source['note'], quote=source['quote'], source=source['source'])
+        link.key = source.get('key', str(uuid.uuid4()))
+        link.stored = source['stored']
+        link.updated = source['updated']
+        link.newsletter = source.get('newsletter', None)
+        return link
 
     @staticmethod
     def first(query):
