@@ -15,7 +15,7 @@
 <div class="row">
   <div class="col-sm-8">
     <h3>Cyberweekly #{{newsletter.number}} - {{newsletter.title}}</h3>
-    {% if newsletter.sent %}<small>Sent on {{newsletter.sentdate}}</small>{% endif %}
+    {% if newsletter.sent %}<small>Sent on {{newsletter.sentdate.date()}}</small>{% endif %}
     <p>{% if newsletter.body %}{{newsletter.body|markdown}}{% endif %}</p>
     {% for link in links %}
     {{macros.displaylink(link)}}
