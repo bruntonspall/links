@@ -100,4 +100,7 @@ def migrate():
         if isinstance(d['stored'], str):
             stored = datetime.fromisoformat(d['stored'])
             Database.db.collection(Newsletter.collection).document(newsletter.id).update({'stored': stored})
+        if isinstance(d['sentdate'], str):
+            stored = datetime.fromisoformat(d['sentdate'])
+            Database.db.collection(Newsletter.collection).document(newsletter.id).update({'sentdate': stored})
     return "OK"
