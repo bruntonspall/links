@@ -9,7 +9,9 @@
     {{macros.input("title", newsletter.title)}}
     {{macros.textarea("body", newsletter.body)}}
     {{macros.input("number", newsletter.number)}}
+    {% if newsletter.sent %}
     {{macros.input("sent", newsletter.sentdate.date(), 'date')}}
+    {% endif %}
     {{macros.input("url", newsletter.url)}}
 
       <button type="submit" class="btn btn-success">Save</button>
