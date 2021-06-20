@@ -14,6 +14,8 @@ from handlers.newsletter import newsletter
 from handlers.links import links
 from handlers.fetch import fetch
 
+from datetime import timedelta
+
 app = Flask(__name__)
 Markdown(app)
 app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(24)
@@ -137,7 +139,9 @@ def callback():
         user = User.create(unique_id, users_email, users_name, picture)
 
     # Begin user session by logging the user in
-    login_user(user, remember=True)
+    login_user(user, remember=True, duration=timedelta(days=6))
+    next = flask.request.args.get('next')
+    logging.warn(f"next: {next}")
 
     # Send user back to homepage
     return redirect("/admin/index")
