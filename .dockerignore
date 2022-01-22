@@ -14,3 +14,7 @@ build
 dist
 scratchpad
 venv
+Dockerfile
+README.md
+*.pyd
+.pytest_cache

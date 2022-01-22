@@ -23,7 +23,7 @@ class NewsletterTestCase(DatabaseTestCase):
         n.sentdate = datetime.fromisoformat("2020-03-07 13:00")
         n.slugify()
         n.save()
-        
+
         n = Newsletter("Newsletter 2", "Some other text")
         n.number = 2
         n.stored = datetime.fromisoformat("2020-03-08 13:00")
@@ -56,7 +56,7 @@ class NewsletterTestCase(DatabaseTestCase):
         self.assertEqual(None, actual['slug'])
 
     def testNewsletterSlugs(self):
-        actual = Newsletter("Kids in America","some text")
+        actual = Newsletter("Kids in America", "some text")
         self.assertEqual("Kids in America", actual.title)
 
         self.assertEqual(None, actual.slug)
@@ -156,10 +156,9 @@ class LinkTestCase(DatabaseTestCase):
         n.sentdate = datetime.fromisoformat("2020-03-07 13:00")
         n.slugify()
         n.save()
-        l = Link(url="http://foo.com/toread1", type=Link.TOREAD, newsletter=n.key())
+        link = Link(url="http://foo.com/toread1", type=Link.TOREAD, newsletter=n.key())
 
-        self.assertEqual(l.get_newsletter().to_dict(), n.to_dict())
-
+        self.assertEqual(link.get_newsletter().to_dict(), n.to_dict())
 
 
 class SettingTestCase(DatabaseTestCase):

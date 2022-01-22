@@ -6,7 +6,13 @@ import uuid
 
 
 class Database:
-    db = firestore.Client()
+    db = None
+
+    @classmethod
+    def getDb(cls):
+        if not cls.db:
+            cls.db = firestore.Client()
+        return cls.db
 
 
 class User(UserMixin):
@@ -37,7 +43,7 @@ class User(UserMixin):
             'name': name,
             'picture': picture
         }
-        Database.db.collection(User.collection).document(id_).set(userdict)
+        Database.getDb().collection(User.collection).document(id_).set(userdict)
         return User.from_dict(userdict)
 
 
@@ -87,7 +93,7 @@ class Newsletter:
 
     def save(self):
         self.updated = datetime.now()
-        Database.db.collection(Newsletter.collection).document(self.key()).set(self.to_dict())
+        Database.getDb().collection(Newsletter.collection).document(self.key()).set(self.to_dict())
 
     def key(self):
         return str(self.number)
@@ -96,7 +102,7 @@ class Newsletter:
         for link in Link.by_newsletter(self.key()):
             link.newsletter = None
             link.save()
-        Database.db.collection(Newsletter.collection).document(self.key()).delete()
+        Database.getDb().collection(Newsletter.collection).document(self.key()).delete()
 
     @staticmethod
     def first(query):
@@ -108,7 +114,7 @@ class Newsletter:
 
     @staticmethod
     def _list():
-        return Database.db.collection(Newsletter.collection).order_by(u"updated", direction=firestore.Query.DESCENDING)
+        return Database.getDb().collection(Newsletter.collection).order_by(u"updated", direction=firestore.Query.DESCENDING)
 
     @staticmethod
     def list():
@@ -116,7 +122,7 @@ class Newsletter:
 
     @staticmethod
     def _list_published():
-        return Database.db.collection(Newsletter.collection).where(u"sent", "==", True).order_by(u"sentdate", direction=firestore.Query.DESCENDING)
+        return Database.getDb().collection(Newsletter.collection).where(u"sent", "==", True).order_by(u"sentdate", direction=firestore.Query.DESCENDING)
 
     @staticmethod
     def list_published():
@@ -132,15 +138,15 @@ class Newsletter:
 
     @staticmethod
     def by_number(number):
-        return Newsletter.first(Database.db.collection(Newsletter.collection).where(u"number", "==", number))
+        return Newsletter.first(Database.getDb().collection(Newsletter.collection).where(u"number", "==", number))
 
     @staticmethod
     def by_slug(slug):
-        return Newsletter.first(Database.db.collection(Newsletter.collection).where(u"slug", "==", slug))
+        return Newsletter.first(Database.getDb().collection(Newsletter.collection).where(u"slug", "==", slug))
 
     @staticmethod
     def get(key):
-        return Newsletter.from_dict(Database.db.collection(Newsletter.collection).document(key).get().to_dict())
+        return Newsletter.from_dict(Database.getDb().collection(Newsletter.collection).document(key).get().to_dict())
 
     def slugify(self):
         if not self.title:
@@ -221,11 +227,11 @@ class Link:
 
     def save(self):
         self.updated = datetime.now()
-        Database.db.collection(Link.collection).document(self.key).set(self.to_dict())
+        Database.getDb().collection(Link.collection).document(self.key).set(self.to_dict())
 
     @staticmethod
     def query():
-        return Database.db.collection(Link.collection)
+        return Database.getDb().collection(Link.collection)
 
     @staticmethod
     def get_by_url(url):
@@ -274,9 +280,9 @@ class Settings:
 
     @staticmethod
     def get(name, default="NOT SET"):
-        retval = Database.db.collection(Settings.collection).document(name).get()
+        retval = Database.getDb().collection(Settings.collection).document(name).get()
         if not retval.exists:
-            Database.db.collection(Settings.collection).document(name).set({
+            Database.getDb().collection(Settings.collection).document(name).set({
                 "name": name,
                 "value": default
             })
@@ -285,7 +291,7 @@ class Settings:
 
     @staticmethod
     def set(name, value):
-        Database.db.collection(Settings.collection).document(name).set({
+        Database.getDb().collection(Settings.collection).document(name).set({
             "name": name,
             "value": value
         })

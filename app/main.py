@@ -15,6 +15,13 @@ from handlers.links import links
 from handlers.fetch import fetch
 
 from datetime import timedelta
+from flask_login import (
+    LoginManager,
+    login_required,
+    login_user,
+    logout_user,
+)
+from oauthlib.oauth2 import WebApplicationClient
 
 app = Flask(__name__)
 Markdown(app)
@@ -26,14 +33,6 @@ app.register_blueprint(newsletter, url_prefix='/admin/newsletter')
 app.register_blueprint(links, url_prefix='/admin/link')
 app.register_blueprint(fetch, url_prefix='/admin/fetch')
 
-from flask_login import (
-    LoginManager,
-    current_user,
-    login_required,
-    login_user,
-    logout_user,
-)
-from oauthlib.oauth2 import WebApplicationClient
 
 # Configuration
 GOOGLE_CLIENT_ID = os.environ.get("OAUTH_CLIENTID", None)
@@ -51,18 +50,22 @@ client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
 ALLOWED_USERS = ["michael@brunton-spall.co.uk", "joel@slash32.co.uk"]
 
+
 # Flask-Login helper to retrieve a user from our db
 @login_manager.user_loader
 def load_user(user_id):
     return User.get(user_id)
+
 
 @app.route('/admin/index')
 @login_required
 def adminindex():
     return render_template("adminlist.html", newsletters=Newsletter.list(), queue=Link.queued(), links=Link.drafts())
 
+
 def get_google_provider_cfg():
     return requests.get(GOOGLE_DISCOVERY_URL).json()
+
 
 @app.route("/login")
 def login():
@@ -79,6 +82,7 @@ def login():
     )
     logging.warning(f"Redirecting to {request_uri}")
     return redirect(request_uri)
+
 
 @app.route("/login/callback")
 def callback():
@@ -140,11 +144,12 @@ def callback():
 
     # Begin user session by logging the user in
     login_user(user, remember=True, duration=timedelta(days=6))
-    next = flask.request.args.get('next')
+    next = request.args.get('next')
     logging.warn(f"next: {next}")
 
     # Send user back to homepage
     return redirect("/admin/index")
+
 
 @app.route("/logout")
 @login_required
@@ -152,10 +157,12 @@ def logout():
     logout_user()
     return redirect(url_for("index"))
 
+
 @app.route('/admin/readinglist')
 @login_required
 def reading():
     return render_template("readinglist.html", newsletters=Newsletter.list(), readinglist=Link.toread())
+
 
 @app.route('/')
 def index():
@@ -180,9 +187,10 @@ def server_error(e):
     logging.exception('An error occurred during a request.')
     return 'An internal error occurred.', 500
 
+
 if __name__ == '__main__':
     import os
-    if os.environ.get("LOCALDB",False):
+    if os.environ.get("LOCALDB", False):
         from mockfirestore import MockFirestore
         Database.db = MockFirestore()
         app.config['LOGIN_DISABLED'] = True

@@ -1,16 +1,21 @@
-FROM python:3.7 as build
+FROM python:3.10-slim as build
 
-COPY . .
+COPY requirements.txt .
 RUN pip install -r requirements.txt
+COPY requirements-dev.txt .
 RUN pip install -r requirements-dev.txt
 
-# RUN pytest .
+ENV APP_HOME /app
+WORKDIR $APP_HOME
+COPY app ./
 
-FROM python:3.7-slim
-COPY --from=build app /app
-COPY --from=build requirements.txt /app
+ENV GOOGLE_APPLICATION_CREDENTIALS=/config
+RUN pytest
 
-WORKDIR /app
+FROM python:3.10-slim
+ENV APP_HOME /app
+WORKDIR $APP_HOME
+COPY --from=build /app .
+COPY requirements.txt .
 RUN pip install -r requirements.txt
-EXPOSE 8080
-CMD ["python", "main.py"]
+CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 main:app
