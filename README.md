@@ -32,21 +32,15 @@ A newsletter isn't strictly lifecycled itself, it's considered sent providing th
 
 Originally this ran locally really easily, but switching to using Google Auth for login has made things a bit more complex.
 
-It expects to run against a Google Firestore, but if you set the LOCALDB environment variable to 1, then the code will run against an in-memory mock.
+If you run this using gunicorn, then it will skip the main.py main section.  If you run python main.py, then the main section will disable authentication and then the code will run against an in-memory mock.
 
-However, for any login required url, you need to authenticate using the Google OAuth systems.  If you setup a Google development account, you can include localhost as a redirect and things should work, however, the client notes will not allow you to change protocols, so you need to stick with https everywhere.  
+If you want to run it in a more integration manner, you can set the OAUTH_CLIENTID, OAUTH_CLIENTSECRET, GOOGLE_CLOUD_PROJECT and GOOGLE_APPLICATION_CREDENTIALS to whatever values you need, and then initialse a Google Firestore database, and it will run against that.  For login however, you'll need to work out how to present localhost over HTTPS, using something like Traefik and letsencrypt or similar.
 
-In order to fix that, if you run the app with the LOCALDB enabled, by default, it will set the LOGIN DISABLED config flag, which should bypass all of that, but makes debugging anything with Login a bit of a pain.
-
-To build the software, just run the build.sh, which should run the docker built command and create a tagged container called `links`.  Then you can run the software with run.sh.
-
-You'll need to export and set the Google SDK environment variables if you need any of the login stuff working.
+To build the software, just run the build.sh, which should run the docker built command and create a tagged container called `links`.  Then you can run the software with debug.sh to run it locally.
 
 Once you've got it running, you'll want some data.  using curl to hit http://localhost:8080/admin/admin/testdata will create a sample newsletter and 2 sample links.
 
 Posting the `export` json file to http://localhost:8080/admin/import should import several hundred cyberweekly newsletters, and lots of local links and various things.
-
-At the current time, you may also then need to hit localhost:8080/admin/migrate to fixup the data model.
 
 ## Code layout
 

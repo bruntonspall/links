@@ -189,10 +189,8 @@ def server_error(e):
 
 
 if __name__ == '__main__':
-    import os
-    if os.environ.get("LOCALDB", False):
-        from mockfirestore import MockFirestore
-        Database.db = MockFirestore()
-        app.config['LOGIN_DISABLED'] = True
-    app.run(debug=True, threaded=True, host='0.0.0.0',
-            port=int(os.environ.get('PORT', 8080)))
+    logging.error("Starting up in local development mode")
+    from mockfirestore import MockFirestore
+    Database.db = MockFirestore()
+    app.config['LOGIN_DISABLED'] = True
+    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
