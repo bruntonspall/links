@@ -29,7 +29,12 @@
     <label for="comment">Note</label>
     <textarea name="note" id="note" class="form-control" rows=5>{{link.note}}</textarea>
   </div>
-
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" name="todraft" id="todraft" value="yes">
+    <label class="form-check-label" for="todraft">
+      Move to draft
+    </label>
+  </div>
   <button type="submit" class="btn btn-success">Save</button>
 </form>
 
