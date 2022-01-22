@@ -30,7 +30,7 @@ class User(UserMixin):
 
     @staticmethod
     def get(user_id):
-        docref = Database.db.collection(User.collection).document(user_id).get()
+        docref = Database.getDb().collection(User.collection).document(user_id).get()
         if not docref.exists:
             return None
         return User.from_dict(docref.to_dict())
