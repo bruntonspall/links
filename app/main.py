@@ -189,8 +189,44 @@ def server_error(e):
 
 
 if __name__ == '__main__':
+    def import_from_file(fname):
+        import json
+        data = json.load(open(fname))
+        for nl in data['newsletters']:
+            logging.info(u"Parsing {}".format(nl))
+            # Change up the sent fields
+            if nl['sent']:
+                nl['sentdate'] = nl['sent']
+                nl['sent'] = True
+
+            n = Newsletter.from_dict(nl)
+            n.body = nl['intro']
+            n.slugify()
+            n.save()
+            key = n.key()
+            logging.info(u"Create newsletter {} - {}".format(n.number, n.title))
+            for l in nl['links']:
+                link = Link.from_dict(l)
+                link.newsletter = key
+                
+                link.save()
+                logging.info(u"Create link {}".format(link.title))
+        for l in data['queue']:
+            link = Link.from_dict(l)
+            link.save()
+        for l in data['drafts']:
+            link = Link.from_dict(l)
+            link.save()
+        for l in data['readinglist']:
+            link = Link.from_dict(l)
+            link.save()
+
     logging.error("Starting up in local development mode")
+    logging.root.level = logging.INFO
     from mockfirestore import MockFirestore
     Database.db = MockFirestore()
     app.config['LOGIN_DISABLED'] = True
+    import os
+    if os.path.exists("export.json"):
+        import_from_file("export.json")
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
