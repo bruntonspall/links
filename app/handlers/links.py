@@ -23,6 +23,10 @@ def edit_link(linkid):
         link.quote = request.form.get('quote', link.quote)
         link.note = request.form.get('note', link.note)
         link.url = request.form.get('url', link.title)
+        link.type = int(request.form.get('linktype', link.type))
+        todraft = request.form.get('todraft', None)
+        if todraft:
+            link.type = Link.DRAFT
 
         link.save()
         return redirect('/admin/index')
@@ -95,7 +99,8 @@ def add_post():
     link.title = request.form.get('title', link.title)
     link.quote = request.form.get('quote', link.quote)
     link.note = request.form.get('note', link.note)
-    todraft = request.form.get('todraft')
+    link.type = int(request.form.get('linktype', link.type))
+    todraft = request.form.get('todraft', None)
     if todraft:
         link.type = Link.DRAFT
     link.save()
