@@ -2,34 +2,13 @@
 {% import "macros.html" as macros %}
 
 {% block content %}
-<div class="row">
-  <div class="jumbotron">
-    <h1 class="display-4">Cyberweekly</h1>
-    <p class="lead">A weekly roundup of interesting content from across the web that is of interest to people working in cyber security. Generally long form articles and blog posts, as well as links to outages, incidents and security bugs that you might find interesting. Presented with a small amount of editorial comment</p>
-    <hr class="my-4">
-    <p class="lead">
-      <iframe src="https://cyberweekly.substack.com/embed" width="480" height="320" style="border:1px solid #EEE; background:white;" frameborder="0" scrolling="no"></iframe>    </p>
-  </div>
-</div>
-<h2>Previous Editions</h2>
-<div class="row">
-  <div class="col-sm-8">
-    <h3>Cyberweekly #{{newsletter.number}} - {{newsletter.title}}</h3>
-    {% if newsletter.sent %}<small>Sent on {{newsletter.sentdate.date()}}</small>{% endif %}
-    <p>{% if newsletter.body %}{{newsletter.body|markdown}}{% endif %}</p>
-    {% for link in links %}
-    {{macros.displaylink(link)}}
-    {% else %}
-    <p>No links found</p>
-    {% endfor %}
-  </div>
-  <div class="col-sm-4">
-    <h2>Previous Editions</h2>
-    <ul class="list-unstyled">
-{% for newsletter in newsletters %}
-<li><a href="/{{newsletter.slugify()}}">{{ newsletter.number }} - {{newsletter.title}}</a></li>
-{% endfor %}
-</ul>
+<div class="bg-white pt-12 pb-26 px-2 sm:px-8 lg:px-28 rounded-lg">
+  <div class="flex w-full justify-center flex-col items-start justify-center">
+    <h1 class="font-bold text-4xl mb-4">Cyberweekly</h1>
+    <p class="leading-normal text-md mb-4">A weekly roundup of interesting content from across the web that is of interest to people working in cyber security. Generally long form articles and blog posts, as well as links to outages, incidents and security bugs that you might find interesting. Presented with a small amount of editorial comment</p>
+    <p class="leading-normal text-md mb-4">Cyberweekly has been going since May 2018, for over 180 issues now</p>
+    <p class="leading-normal text-md mb-4">You can <a class="underline" href="/archive">browse the archive</a> or you can subscribe to recieve weekly updates, sent on Sunday evenings to wait in your inbox for Monday morning commute.</p>
+    <iframe class="mb-8 align-center w-full" src="https://cyberweekly.substack.com/embed" height="320" frameborder="0" scrolling="no"></iframe>
   </div>
 </div>
 {% endblock %}

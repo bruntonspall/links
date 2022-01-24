@@ -1,21 +1,40 @@
 {% extends "base.html" %}
 {% import "macros.html" as macros %}
 
+{%block header %}
+Edit Cyberweekly #{{newsletter.number}} - {{newsletter.title}}
+{% endblock %}
+
 {% block content %}
-<div class="row">
-  <div class="col-sm-12">
-    <form method="POST" enctype="multipart/form-data">
+      <form method="POST" enctype="multipart/form-data">
 
-    {{macros.input("title", newsletter.title)}}
-    {{macros.textarea("body", newsletter.body)}}
-    {{macros.input("number", newsletter.number)}}
-    {% if newsletter.sent %}
-    {{macros.input("sent", newsletter.sentdate.date(), 'date')}}
-    {% endif %}
-    {{macros.input("url", newsletter.url)}}
+        <div class="form-group mb-6">
+          <label for="title" class="block mb-2 text-sm font-medium text-gray-900">Title</label>
+          <input type="text" name="title" id="title" value="{{newsletter.title}}" class="form-control bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"/>
+        </div>
+      
+        <div class="form-group mb-6">
+          <label for="body" class="block mb-2 text-sm font-medium text-gray-900">Body</label>
+          <textarea name="body" id="body" rows=20 class="form-control bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">{{newsletter.body}}</textarea>
+        </div>
+      
+        <div class="form-group mb-6">
+          <label for="number" class="block mb-2 text-sm font-medium text-gray-900">Number</label>
+          <input type=number name="number" id="number" value="{{newsletter.number}}" class="form-control bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"/>
+        </div>
 
-      <button type="submit" class="btn btn-success">Save</button>
+        {% if newsletter.sent %}
+        <div class="form-group mb-6">
+          <label for="sent" class="block mb-2 text-sm font-medium text-gray-900">Sent</label>
+          <input type="text" name="sent" id="sent" value="{{newsletter.sentdate.date()}}" class="form-control bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"/>
+        </div>
+        {% endif %}
+
+        <div class="form-group mb-6">
+          <label for="url" class="block mb-2 text-sm font-medium text-gray-900">URL</label>
+          <input type="text" name="url" id="url" value="{{newsletter.url}}" class="form-control bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"/>
+        </div>
+
+      <button type="submit" class="btn btn-success text-white bg-sky-600 hover:bg-sky-700 focus:ring-4 focus:ring-sky-300 rounded-lg text-sm w-full px-5 py-2.5 text-center">Save</button>
     </form>
-  </div>
-</div>
 {% endblock %}

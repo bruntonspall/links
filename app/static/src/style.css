@@ -1,0 +1,9 @@
+@tailwind base;
+@layer base {
+    p {
+        @apply mt-2;
+    }
+}
+@tailwind components;
+@tailwind utilities;
+

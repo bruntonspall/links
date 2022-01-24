@@ -1,7 +1,7 @@
 {% macro input(name, value='', type='text') -%}
-<div class="form-group">
-  <label for="{{name}}">{{name|title}}</label>
-  <input type="text" name="{{name}}" id="{{name}}" value="{{value|e}}" class="form-control"/>
+<div class="form-group mb-6">
+  <label for="{{name}}" class="block mb-2 text-sm font-medium text-gray-900">{{name|title}}</label>
+  <input type="text" name="{{name}}" id="{{name}}" value="{{value|e}}" class="form-control bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg"/>
 </div>
 {%- endmacro %}
 
@@ -14,61 +14,62 @@
 {%- endmacro %}
 
 {%- macro linkcard(link) -%}
-<div class="card">
-  <div class="card-body">
-    <h5 class="card-title"><a href="{{link.url}}">{{link.title}}</a></h5>
-    <h6 class="card-subtitle">{{link.url}}</h6>
+<div class="card block bg-white border border-gray-200 hover:bg-gray-200 shadow-md rounded-lg mb-4">  
+  <div class="px-6 pb-6 overflow-clip">
+    <h5 class="card-title mb-2 text-xl font-bold text-gray-900"><a href="{{link.url}}">{{link.title}}</a></h5>
+    <h6 class="card-subtitle mb-2 font-normal text-gray-700 overflow-clip">{{link.url}}</h6>
     {% if link.quote %}
-    <blockquote class="card-text"><em>{{link.quote|truncate(100)|markdown}}</em></blockquote>
+    <blockquote class="card-text mx-2 text-gray-700 bg-gray-100 overflow-clip"><em>{{link.quote|truncate(100)|markdown}}</em></blockquote>
     {% endif %}
     {% if link.note %}
-    <p class="card-text">{{link.note|truncate(100)|markdown}}</p>
+    <p class="card-text mb-2 font-normal text-gray-700 overflow-clip">{{link.note|truncate(100)|markdown}}</p>
     {% endif %}
   </div>
-  <div class="card-footer text-muted">
-    <a href="/admin/link/{{link.key}}/edit" class="card-link">Edit</a>
-    {% if link.type == 0 %}<a href="/admin/link/{{link.key}}/read" class="card-link">Read</a>{%endif%}
-    {% if link.type == 1 %}<a href="/admin/link/{{link.key}}/unread" class="card-link">Unread</a>{%endif%}
-    {% if link.type == 1 %}<a href="/admin/link/{{link.key}}/queue" class="card-link">Queue</a>{%endif%}
-    {% if link.type == 2 %}<a href="/admin/link/{{link.key}}/dequeue" class="card-link">Dequeue</a>{%endif%}
-    <a href="/admin/link/{{link.key}}/delete" class="card-link">Delete</a>
+  <div class="card-header flex px-6 py-4 space-x-3 bg-slate-200 justify-between rounded-lg">
+    <a href="/admin/link/{{link.key}}/edit" class="inline-flex items-center bg-sky-600 hover:bg-sky-700 focus:ring-4 focus:ring-sky-300 py-2 px-4 text-sm font-medium text-white border-slate-700 rounded-lg">Edit</a>
+    {% if link.type == 0 %}<a href="/admin/link/{{link.key}}/read" class="inline-flex items-center bg-sky-600 hover:bg-sky-700 focus:ring-4 focus:ring-sky-300 py-2 px-4 text-sm font-medium text-white border-slate-700 rounded-lg">Read</a>{%endif%}
+    {% if link.type == 1 %}<a href="/admin/link/{{link.key}}/unread" class="inline-flex items-center bg-sky-600 hover:bg-sky-700 focus:ring-4 focus:ring-sky-300 py-2 px-4 text-sm font-medium text-white border-slate-700 rounded-lg">Unread</a>{%endif%}
+    {% if link.type == 1 %}<a href="/admin/link/{{link.key}}/queue" class="inline-flex items-center bg-sky-600 hover:bg-sky-700 focus:ring-4 focus:ring-sky-300 py-2 px-4 text-sm font-medium text-white border-slate-700 rounded-lg">Queue</a>{%endif%}
+    {% if link.type == 2 %}<a href="/admin/link/{{link.key}}/dequeue" class="inline-flex items-center bg-sky-600 hover:bg-sky-700 focus:ring-4 focus:ring-sky-300 py-2 px-4 text-sm font-medium text-white border-slate-700 rounded-lg">Dequeue</a>{%endif%}
+    <a href="/admin/link/{{link.key}}/delete" class="inline-flex items-center bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 py-2 px-4 text-sm font-medium text-white border-slate-700 rounded-lg">Delete</a>
   </div>
 </div>
 {%- endmacro %}
 
 {%- macro link(link, edit=True) -%}
-<div class="card">
-  <div class="card-body">
-    <h5 class="card-title"><a href="{{link.url}}">{{link.title}}</a></h5>
-    <h6 class="card-subtitle">{{link.url}}</h6>
+<div class="card block bg-white border border-gray-200 hover:bg-gray-200 shadow-md rounded-lg mb-4">
+  <div class="card-header flex px-6 py-4 space-x-3 bg-slate-200 justify-between rounded-lg">
+    <a href="/admin/link/{{link.key}}/edit" class="inline-flex items-center bg-sky-600 hover:bg-sky-700 focus:ring-4 focus:ring-sky-300 py-2 px-4 text-sm font-medium text-white border-slate-700 rounded-lg">Edit</a>
+    {% if link.type == 0 %}<a href="/admin/link/{{link.key}}/read" class="inline-flex items-center bg-sky-600 hover:bg-sky-700 focus:ring-4 focus:ring-sky-300 py-2 px-4 text-sm font-medium text-white border-slate-700 rounded-lg">Read</a>{%endif%}
+    {% if link.type == 1 %}<a href="/admin/link/{{link.key}}/unread" class="inline-flex items-center bg-sky-600 hover:bg-sky-700 focus:ring-4 focus:ring-sky-300 py-2 px-4 text-sm font-medium text-white border-slate-700 rounded-lg">Unread</a>{%endif%}
+    {% if link.type == 1 %}<a href="/admin/link/{{link.key}}/queue" class="inline-flex items-center bg-sky-600 hover:bg-sky-700 focus:ring-4 focus:ring-sky-300 py-2 px-4 text-sm font-medium text-white border-slate-700 rounded-lg">Queue</a>{%endif%}
+    {% if link.type == 2 %}<a href="/admin/link/{{link.key}}/dequeue" class="inline-flex items-center bg-sky-600 hover:bg-sky-700 focus:ring-4 focus:ring-sky-300 py-2 px-4 text-sm font-medium text-white border-slate-700 rounded-lg">Dequeue</a>{%endif%}
+    <a href="/admin/link/{{link.key}}/delete" class="inline-flex items-center bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 py-2 px-4 text-sm font-medium text-white border-slate-700 rounded-lg">Delete</a>
+  </div>
+  <div class="card-body px-6 pb-6 overflow-clip">
+    <h5 class="card-title mb-2 text-xl font-bold text-gray-900"><a href="{{link.url}}">{{link.title}}</a></h5>
+    <h6 class="card-subtitle mb-2 font-normal text-gray-700 overflow-clip">{{link.url}}</h6>
     {% if link.quote %}
-    <blockquote class="card-text"><em>{{link.quote|markdown}}</em></blockquote>
+    <blockquote class="card-text mx-2 py-4 px-2 text-gray-700 bg-gray-100 overflow-clip"><em>{{link.quote|markdown}}</em></blockquote>
     {% endif %}
     {% if link.note %}
-    <p class="card-text">{{link.note|markdown}}</p>
+    <p class="card-text mb-2 font-normal text-gray-700 overflow-clip">{{link.note|markdown}}</p>
     {% endif %}
   </div>
-{% if edit %}
-  <div class="card-footer text-muted">
-    <a href="/admin/link/{{link.key}}/edit" class="card-link">Edit</a>
-    {% if link.type == 0 %}<a href="/admin/link/{{link.key}}/read" class="card-link">Read</a>{%endif%}
-    {% if link.type == 1 %}<a href="/admin/link/{{link.key}}/unread" class="card-link">Unread</a>{%endif%}
-    {% if link.type == 1 %}<a href="/admin/link/{{link.key}}/queue" class="card-link">Queue</a>{%endif%}
-    {% if link.type == 2 %}<a href="/admin/link/{{link.key}}/dequeue" class="card-link">Dequeue</a>{%endif%}
-    <a href="/admin/link/{{link.key}}/delete" class="card-link">Delete</a>
-  </div>
+  {% if edit %}
+  
 {% endif %}
 </div>
 {%- endmacro %}
 
 {%- macro displaylink(link) -%}
-<div class="">
-  <h5 class=""><a href="{{link.url}}">{{link.title}}</a></h5>
-  <h6 class="">{{link.url}}</h6>
+<div class="py-4 overflow-clip">
+  <h5 class="mb-2 text-xl font-bold text-gray-900"><a href="{{link.url}}">{{link.title}}</a></h5>
+  <p class="mb-4 mx-2 font-normal text-gray-700 underline"><a href="{{link.url}}">{{link.url}}</a></p>
   {% if link.quote %}
-  <blockquote class="">{{link.quote|markdown}}</blockquote>
+  <blockquote class="mx-2 mb-2 py-2 px-4 text-gray-900 bg-gray-200 rounded-lg">{{link.quote|markdown}}</blockquote>
   {% endif %}
-  {{link.note|markdown}}
+  <div class="font-normal mx-2 text-gray-900">{{link.note|markdown}}</div>
 </div>
 
 {%- endmacro %}

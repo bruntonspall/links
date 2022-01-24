@@ -169,7 +169,15 @@ def index():
     nl = Newsletter.most_recent_published()
     if not nl:
         nl = Newsletter(title="DEBUG NEWSLETTER", body="DEBUG DEBUG, DEBUG", number=-1)
-    return render_template("front/index.html", newsletter=nl, links=Link.by_newsletter(nl.key()), newsletters=Newsletter.list_published())
+    return render_template("front/index.html", newsletter=nl)
+
+
+@app.route('/archive')
+def archive():
+    nl = Newsletter.most_recent_published()
+    if not nl:
+        nl = Newsletter(title="DEBUG NEWSLETTER", body="DEBUG DEBUG, DEBUG", number=-1)
+    return render_template("front/archive.html", newsletter=nl, newsletters=Newsletter.list_published())
 
 
 @app.route('/<newsletterslug>')
@@ -205,26 +213,30 @@ if __name__ == '__main__':
             n.save()
             key = n.key()
             logging.info(u"Create newsletter {} - {}".format(n.number, n.title))
-            for l in nl['links']:
-                link = Link.from_dict(l)
+            for sublink in nl['links']:
+                link = Link.from_dict(sublink)
                 link.newsletter = key
-                
                 link.save()
                 logging.info(u"Create link {}".format(link.title))
-        for l in data['queue']:
-            link = Link.from_dict(l)
+        for sublink in data['queue']:
+            link = Link.from_dict(sublink)
             link.save()
-        for l in data['drafts']:
-            link = Link.from_dict(l)
+        for sublink in data['drafts']:
+            link = Link.from_dict(sublink)
             link.save()
-        for l in data['readinglist']:
-            link = Link.from_dict(l)
+        for sublink in data['readinglist']:
+            link = Link.from_dict(sublink)
             link.save()
 
     logging.error("Starting up in local development mode")
     logging.root.level = logging.INFO
     from mockfirestore import MockFirestore
     Database.db = MockFirestore()
+
+    @app.before_first_request
+    def login_test_user():
+        user = User.create("testuser", "test@test.com", "Test User", "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80")
+        login_user(user)
     app.config['LOGIN_DISABLED'] = True
     import os
     if os.path.exists("export.json"):
