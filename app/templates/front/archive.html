@@ -2,17 +2,16 @@
 {% import "macros.html" as macros %}
 
 {% block content %}
-<div class="bg-white pt-12 pb-26 px-2 sm:px-8 lg:px-28 rounded-lg">
-
-    <h2 class="text-3xl font-bold mb-4">Archive</h2>
-      <ol class="list-unstyled divide-y divide-gray-200">
-      {% for newsletter in newsletters %}
-      <li class="pb-4 pt-6 px-4"><a href="/{{newsletter.slugify()}}">
-        <span class="text-sm text-gray-700 mb-4">{{newsletter.sentdate.strftime("%B %d, %Y")}}</span>
-        <h3 class="text-lg text-gray-900 font-semibold leading-relaxed">Cyberweekly #{{ newsletter.number }} - {{newsletter.title}}</h3>
-        <p class="text-md text-gray-900">{{newsletter.body|truncate}}</p>
-      </a></li>
-      {% endfor %}
-      </ol>
+<div class="basis-3/4 maincontent">
+  <h2 class="headline">Archive</h2>
+  <ol class="list-unstyled divide-y divide-gray-200">
+    {% for newsletter in newsletters %}
+    <li class="pb-4 pt-2"><a href="/{{newsletter.slugify()}}">
+      <span class="text-sm text-gray-700 mb-4">{{newsletter.sentdate.strftime("%B %d, %Y")}}</span>
+      <h3 class="text-lg text-gray-900 font-semibold leading-relaxed">Cyberweekly #{{ newsletter.number }} - {{newsletter.title}}</h3>
+      <p class="text-md text-gray-900">{{newsletter.body|truncate}}</p>
+    </a></li>
+    {% endfor %}
+  </ol>
 </div>
 {% endblock %}

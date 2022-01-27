@@ -21,27 +21,30 @@
 }
 
 .buttons {
-    @apply flex space-x-3 justify-between;
+    @apply flex flex-col space-y-1 md:space-y-0 md:flex-row justify-between;
 }
 
 .card {
-    @apply bg-white border border-gray-200 shadow-md rounded-lg mb-4;
+    @apply bg-white border border-gray-200 shadow-md rounded-lg mb-4 overflow-clip;
 }
 
 .card-title {
-    @apply mb-2 text-xl font-bold text-gray-900;
+    @apply mb-2 text-xl font-bold text-gray-900 overflow-clip;
 }
 
+.card-subtitle {
+    @apply overflow-clip break-all;
+}
 .card-body {
-    @apply flex-col space-y-2 mx-4;
+    @apply flex-col space-y-2 mx-4 overflow-clip break-all sm:break-normal;
 }
 
 .card-header {
-    @apply px-6 py-4 bg-slate-200 rounded-lg justify-center;
+    @apply px-6 py-4 bg-slate-200 rounded-lg flex flex-col space-y-1 md:space-y-0 md:flex-row justify-between;
 }
 
 .quote {
-    @apply mx-2 text-gray-700 bg-gray-200;
+    @apply mx-2 px-2 text-gray-700 bg-gray-200 rounded-xl;
 }
 
 .navbar {
@@ -53,7 +56,7 @@
 }
 
 .navbar-user {
-    @apply absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0;
+    @apply flex items-center pr-2 block;
 }
 
 .navbar-link {
@@ -61,18 +64,26 @@
 }
 
 .header {
-    @apply bg-gray-100 max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8;
+    @apply bg-gray-100 max-w-7xl mx-8 py-6 px-4 sm:px-6 lg:px-8;
 }
 .main {
-    @apply bg-gray-100 mx-auto h-full py-8 px-6 sm:px-4 lg:px-8 max-w-full flex space-x-8;
+    @apply bg-gray-100 mx-auto h-full mx-8 py-8 px-6 sm:px-4 lg:px-8 max-w-full flex flex-col md:flex-row space-x-8;
 }
 
 .columnheading {
     @apply text-2xl font-bold text-gray-900 mb-4;
 }
 
-.header {
-    @apply text-3xl font-bold px-2 text-gray-900;
+.headline {
+    @apply text-3xl font-bold text-gray-900 mb-4;
+}
+
+.maincontent {
+    @apply pt-12 pb-28 px-2 sm:px-6 lg:px-12;
+}
+
+.sidebar {
+    @apply pt-12 pb-28 px-2 lg:px-4;
 }
 
 /* Form Styles */

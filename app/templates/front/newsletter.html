@@ -2,11 +2,10 @@
 {% import "macros.html" as macros %}
 
 {% block content %}
-<div class="main">
-  <div class="basis-3/4">
-    <h2 class="text-3xl font-bold mb-4">Cyberweekly #{{newsletter.number}} - {{newsletter.title}}</h2>
-    <span class="text-sm text-gray-700 mb-4">Published on {{newsletter.sentdate.strftime("%A, %B %d, %Y")}}</span>
-    <div class="text-gray-900 font-normal leading-relaxed mb-4">{% if newsletter.body %}{{newsletter.body|markdown}}{% endif %}</div>
+  <div class="basis-3/4 maincontent">
+    <h2 class="headline">Cyberweekly #{{newsletter.number}} - {{newsletter.title}}</h2>
+    <p class="text-sm text-gray-700 mb-4">Published on {{newsletter.sentdate.strftime("%A, %B %d, %Y")}}</p>
+    <div class="text-gray-900 font-normal leading-relaxed mb-4 break-normal">{% if newsletter.body %}{{newsletter.body|markdown}}{% endif %}</div>
     <ol class="divide-y divide-gray-300">
     {% for link in links %}
     {{macros.displaylink(link)}}
@@ -15,7 +14,7 @@
     {% endfor %}
     </ol>
   </div>
-  <div class="basis-1/4">
+  <div class="basis-1/4 sidebar">
     {% if newsletters %}
     <h2 class="columnheading">Newsletters</h2>
     <ul>
@@ -25,5 +24,4 @@
     </ul>
     {%endif%}
   </div>
-</div>
 {% endblock %}

@@ -33,7 +33,7 @@
   </div>
   <div class="card-body">
     <h5 class="card-title"><a href="{{link.url}}">{{link.title}}</a></h5>
-    <h6 class="">{{link.url}}</h6>
+    <h6 class="card-subtitle">{{link.url}}</h6>
     {% if link.quote %}
     <blockquote class="quote"><em>{{link.quote|markdown}}</em></blockquote>
     {% endif %}
@@ -50,11 +50,11 @@
 {%- macro displaylink(link) -%}
 <div class="py-4 overflow-clip">
   <h5 class="mb-2 text-xl font-bold text-gray-900"><a href="{{link.url}}">{{link.title}}</a></h5>
-  <p class="mb-4 mx-2 font-normal text-gray-700 underline"><a href="{{link.url}}">{{link.url}}</a></p>
+  <p class="mb-4 font-normal text-gray-700 underline break-all"><a href="{{link.url}}">{{link.url}}</a></p>
   {% if link.quote %}
-  <blockquote class="mx-2 mb-2 py-2 px-4 text-gray-900 bg-gray-200 rounded-lg">{{link.quote|markdown}}</blockquote>
+  <blockquote class="mx-2 px-4 pt-2 pb-4 quote">{{link.quote|markdown}}</blockquote>
   {% endif %}
-  <div class="font-normal mx-2 text-gray-900">{{link.note|markdown}}</div>
+  <div class="font-normal text-gray-900">{{link.note|markdown}}</div>
 </div>
 
 {%- endmacro %}
