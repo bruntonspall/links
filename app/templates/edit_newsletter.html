@@ -1,21 +1,40 @@
 {% extends "base.html" %}
 {% import "macros.html" as macros %}
 
+{%block header %}
+Edit Cyberweekly #{{newsletter.number}} - {{newsletter.title}}
+{% endblock %}
+
 {% block content %}
-<div class="row">
-  <div class="col-sm-12">
-    <form method="POST" enctype="multipart/form-data">
+      <form method="POST" enctype="multipart/form-data">
 
-    {{macros.input("title", newsletter.title)}}
-    {{macros.textarea("body", newsletter.body)}}
-    {{macros.input("number", newsletter.number)}}
-    {% if newsletter.sent %}
-    {{macros.input("sent", newsletter.sentdate.date(), 'date')}}
-    {% endif %}
-    {{macros.input("url", newsletter.url)}}
+        <div class="form-group mb-6">
+          <label for="title" class="">Title</label>
+          <input type="text" name="title" id="title" value="{{newsletter.title}}" class=""/>
+        </div>
+      
+        <div class="form-group mb-6">
+          <label for="body" class="">Body</label>
+          <textarea name="body" id="body" rows=20 class="">{{newsletter.body}}</textarea>
+        </div>
+      
+        <div class="form-group mb-6">
+          <label for="number" class="">Number</label>
+          <input type=number name="number" id="number" value="{{newsletter.number}}" class=""/>
+        </div>
 
-      <button type="submit" class="btn btn-success">Save</button>
+        {% if newsletter.sent %}
+        <div class="form-group mb-6">
+          <label for="sent" class="">Sent</label>
+          <input type="text" name="sent" id="sent" value="{{newsletter.sentdate.date()}}" class=""/>
+        </div>
+        {% endif %}
+
+        <div class="form-group mb-6">
+          <label for="url" class="">URL</label>
+          <input type="text" name="url" id="url" value="{{newsletter.url}}" class=""/>
+        </div>
+
+      <button type="submit" class="btn-primary">Save</button>
     </form>
-  </div>
-</div>
 {% endblock %}

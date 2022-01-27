@@ -4,25 +4,25 @@
 
 {% block content %}
 
-<div class="row">
-  <div class="col-6">
-      <h3>Draft - {{links|length}}</h3>
+<div class="grid lg:grid-cols-2 sm:grid-cols-1">
+  <div class="p-2">
+      <h3 class="columnheading">Draft: {{links|length}}</h3>
       {% for link in links %}
           {{ macros.link(link) }}
       {% else %}
       <p>No links found</p>
       {% endfor %}
   </div>
-  <div class="col-6">
-      <h3>Queued - {{queue|length}}</h3>
+  <div class="p-2">
+      <h3 class="columnheading">Queued: {{queue|length}}</h3>
+      <form action="/admin/newsletter/create" method="post" class="card-header mb-4">
+        <button type="submit" class="btn-primary">Create Newsletter</button>
+      </form>
       {% for link in queue %}
         {{ macros.link(link) }}
       {% else %}
         <p>No links found</p>
       {% endfor %}          
-      <form action="/admin/newsletter/create" method="post">
-        <button type="submit" class="btn btn-success">Create Newsletter</button>
-      </form>
   </div>
 </div>
 

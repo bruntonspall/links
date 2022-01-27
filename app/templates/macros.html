@@ -1,74 +1,60 @@
-{% macro input(name, value='', type='text') -%}
-<div class="form-group">
-  <label for="{{name}}">{{name|title}}</label>
-  <input type="text" name="{{name}}" id="{{name}}" value="{{value|e}}" class="form-control"/>
-</div>
-{%- endmacro %}
-
-{%- macro textarea(name, value='', rows=10, cols=40) -%}
-<div class="form-group">
-  <label for="{{name}}">{{name|title}}</label>
-  <textarea name="{{ name }}" id="{{name}}" class="form-control" rows="{{ rows }}" cols="{{ cols }}">{{ value|e }}</textarea>
-</div>
-
-{%- endmacro %}
-
 {%- macro linkcard(link) -%}
-<div class="card">
+<div class="card block">  
   <div class="card-body">
     <h5 class="card-title"><a href="{{link.url}}">{{link.title}}</a></h5>
     <h6 class="card-subtitle">{{link.url}}</h6>
     {% if link.quote %}
-    <blockquote class="card-text"><em>{{link.quote|truncate(100)|markdown}}</em></blockquote>
+    <blockquote class="quote"><em>{{link.quote|truncate(100)|markdown}}</em></blockquote>
     {% endif %}
     {% if link.note %}
     <p class="card-text">{{link.note|truncate(100)|markdown}}</p>
     {% endif %}
   </div>
-  <div class="card-footer text-muted">
-    <a href="/admin/link/{{link.key}}/edit" class="card-link">Edit</a>
-    {% if link.type == 0 %}<a href="/admin/link/{{link.key}}/read" class="card-link">Read</a>{%endif%}
-    {% if link.type == 1 %}<a href="/admin/link/{{link.key}}/unread" class="card-link">Unread</a>{%endif%}
-    {% if link.type == 1 %}<a href="/admin/link/{{link.key}}/queue" class="card-link">Queue</a>{%endif%}
-    {% if link.type == 2 %}<a href="/admin/link/{{link.key}}/dequeue" class="card-link">Dequeue</a>{%endif%}
-    <a href="/admin/link/{{link.key}}/delete" class="card-link">Delete</a>
+  <div class="card-header buttons">
+    <a href="/admin/link/{{link.key}}/edit" class="btn">Edit</a>
+    {% if link.type == 0 %}<a href="/admin/link/{{link.key}}/read" class="btn">Read</a>{%endif%}
+    {% if link.type == 1 %}<a href="/admin/link/{{link.key}}/unread" class="btn">Unread</a>{%endif%}
+    {% if link.type == 1 %}<a href="/admin/link/{{link.key}}/queue" class="btn">Queue</a>{%endif%}
+    {% if link.type == 2 %}<a href="/admin/link/{{link.key}}/dequeue" class="btn">Dequeue</a>{%endif%}
+    <a href="/admin/link/{{link.key}}/delete" class="btn-warn">Delete</a>
   </div>
 </div>
 {%- endmacro %}
 
 {%- macro link(link, edit=True) -%}
-<div class="card">
+<div class="card block">
+  <div class="card-header">
+    <a href="/admin/link/{{link.key}}/edit" class="btn">Edit</a>
+    {% if link.type == 0 %}<a href="/admin/link/{{link.key}}/read" class="btn">Read</a>{%endif%}
+    {% if link.type == 1 %}<a href="/admin/link/{{link.key}}/unread" class="btn">Unread</a>{%endif%}
+    {% if link.type == 1 %}<a href="/admin/link/{{link.key}}/queue" class="btn">Queue</a>{%endif%}
+    {% if link.type == 2 %}<a href="/admin/link/{{link.key}}/dequeue" class="btn">Dequeue</a>{%endif%}
+    <a href="/admin/link/{{link.key}}/delete" class="btn-warn">Delete</a>
+  </div>
   <div class="card-body">
     <h5 class="card-title"><a href="{{link.url}}">{{link.title}}</a></h5>
     <h6 class="card-subtitle">{{link.url}}</h6>
     {% if link.quote %}
-    <blockquote class="card-text"><em>{{link.quote|markdown}}</em></blockquote>
+    <blockquote class="quote"><em>{{link.quote|markdown}}</em></blockquote>
     {% endif %}
     {% if link.note %}
-    <p class="card-text">{{link.note|markdown}}</p>
+    <p class="">{{link.note|markdown}}</p>
     {% endif %}
   </div>
-{% if edit %}
-  <div class="card-footer text-muted">
-    <a href="/admin/link/{{link.key}}/edit" class="card-link">Edit</a>
-    {% if link.type == 0 %}<a href="/admin/link/{{link.key}}/read" class="card-link">Read</a>{%endif%}
-    {% if link.type == 1 %}<a href="/admin/link/{{link.key}}/unread" class="card-link">Unread</a>{%endif%}
-    {% if link.type == 1 %}<a href="/admin/link/{{link.key}}/queue" class="card-link">Queue</a>{%endif%}
-    {% if link.type == 2 %}<a href="/admin/link/{{link.key}}/dequeue" class="card-link">Dequeue</a>{%endif%}
-    <a href="/admin/link/{{link.key}}/delete" class="card-link">Delete</a>
-  </div>
+  {% if edit %}
+  
 {% endif %}
 </div>
 {%- endmacro %}
 
 {%- macro displaylink(link) -%}
-<div class="">
-  <h5 class=""><a href="{{link.url}}">{{link.title}}</a></h5>
-  <h6 class="">{{link.url}}</h6>
+<div class="py-4 overflow-clip">
+  <h5 class="mb-2 text-xl font-bold text-gray-900"><a href="{{link.url}}">{{link.title}}</a></h5>
+  <p class="mb-4 font-normal text-gray-700 underline break-all"><a href="{{link.url}}">{{link.url}}</a></p>
   {% if link.quote %}
-  <blockquote class="">{{link.quote|markdown}}</blockquote>
+  <blockquote class="mx-2 px-4 pt-2 pb-4 quote">{{link.quote|markdown}}</blockquote>
   {% endif %}
-  {{link.note|markdown}}
+  <div class="font-normal text-gray-900">{{link.note|markdown}}</div>
 </div>
 
 {%- endmacro %}

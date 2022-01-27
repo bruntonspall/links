@@ -1,0 +1,110 @@
+@tailwind base;
+@layer base {
+    p {
+        @apply mt-2;
+    }
+}
+@tailwind components;
+@tailwind utilities;
+
+/* Cyberweekly Styles */
+.btn {
+    @apply inline-flex items-center bg-sky-600 hover:bg-sky-700 focus:ring-4 focus:ring-sky-300 py-2 px-4 text-sm font-medium text-white border-slate-700 rounded-lg;
+}
+
+.btn-primary {
+    @apply inline-flex items-center bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 py-2 px-4 text-sm font-medium text-white border-slate-700 rounded-lg;
+}
+
+.btn-warn {
+    @apply inline-flex items-center bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 py-2 px-4 text-sm font-medium text-white border-slate-700 rounded-lg;
+}
+
+.buttons {
+    @apply flex flex-col space-y-1 md:space-y-0 md:flex-row justify-between;
+}
+
+.card {
+    @apply bg-white border border-gray-200 shadow-md rounded-lg mb-4 overflow-clip;
+}
+
+.card-title {
+    @apply mb-2 text-xl font-bold text-gray-900 overflow-clip;
+}
+
+.card-subtitle {
+    @apply overflow-clip break-all;
+}
+.card-body {
+    @apply flex-col space-y-2 mx-4 overflow-clip break-all sm:break-normal;
+}
+
+.card-header {
+    @apply px-6 py-4 bg-slate-200 rounded-lg flex flex-col space-y-1 md:space-y-0 md:flex-row justify-between;
+}
+
+.quote {
+    @apply mx-2 px-2 text-gray-700 bg-gray-200 rounded-xl;
+}
+
+.navbar {
+    @apply  bg-gray-800 mx-auto px-2 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between;
+}
+
+.navbar-menu {
+    @apply flex-1 flex flex-col md:flex-row items-center justify-center sm:items-stretch sm:justify-start;
+}
+
+.navbar-user {
+    @apply flex items-center pr-2 block;
+}
+
+.navbar-link {
+    @apply text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-4 rounded-md text-lg font-medium;
+}
+
+.header {
+    @apply bg-gray-100 max-w-7xl mx-8 py-6 px-4 sm:px-6 lg:px-8;
+}
+.main {
+    @apply bg-gray-100 mx-auto h-full mx-8 py-8 px-6 sm:px-4 lg:px-8 max-w-full flex flex-col md:flex-row space-x-8;
+}
+
+.columnheading {
+    @apply text-2xl font-bold text-gray-900 mb-4;
+}
+
+.headline {
+    @apply text-3xl font-bold text-gray-900 mb-4;
+}
+
+.maincontent {
+    @apply pt-12 pb-28 px-2 sm:px-6 lg:px-12;
+}
+
+.sidebar {
+    @apply pt-12 pb-28 px-2 lg:px-4;
+}
+
+/* Form Styles */
+.form-group {
+    @apply mb-6;
+}
+
+.form-group > label {
+    @apply block mb-2 text-lg font-medium text-gray-900;
+}
+
+.form-group > input {
+    @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5;
+}
+.form-group > textarea {
+    @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5;
+}
+.form-group > select {
+    @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5;
+}
+
+p > a {
+    @apply underline;
+}

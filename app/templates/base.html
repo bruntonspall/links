@@ -4,47 +4,51 @@
     <title>Cyber Weekly - Your weekly newsletter for cybersecurity matters</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{url_for('static',filename='css/main.css')}}">
+    {% block head %}{% endblock %}
     </head>
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand" href="/admin/index">Cyber Weekly: {{current_user.name}} <img height=40 src="{{current_user.picture}}"/></a>
-
-<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="/admin/link/add">Add Item</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/admin/readinglist">Reading List</a>
-          </li>
-          {% block nav %}
-      {% if newsletters %}
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Newsletters</a>
-        <div class="dropdown-menu">
-          {% for newsletter in newsletters %}
-          <a class="dropdown-item" href="/admin/newsletter/{{newsletter.key()}}">{{newsletter.number}} - {{newsletter.title}}</a>
-          {% endfor %}
+  <body class="bg-gray-300">
+      <nav class="navbar">
+        <div class="navbar-menu">              
+          <a href="/" class="navbar-link">Cyber Weekly</a>
+          <a href="/archive" class="navbar-link">Archive</a>
+          {% if current_user.is_authenticated %}
+          <a href="/admin/index" class="navbar-link">Admin</a>
+          <a href="/admin/link/add" class="navbar-link">Add Item</a>
+          <a href="/admin/readinglist" class="navbar-link">Reading List</a>
+          {% endif %}
         </div>
-      </li>
-      {%endif%}
-      {% if current_user.is_authenticated %}<li class="nav-item dropdown"><a class="nav-link" href="/logout">Logout</a></li>{% endif %}
-      {% endblock %}
-        </ul>
-      </div>
-      
-    </nav>
-    <div class="container">
-      {% block content %}{% endblock %}
-    </div>
-    {{user}}
+        {% if current_user.is_authenticated %}
+        <div class="navbar-user">
+            <div class="navbar-link">{{current_user.name}}</div> 
+            <img class="h-8 w-8 rounded-full" src="{{current_user.picture}}"/>
+            <a class="navbar-link" href="/logout">Logout</a>
+          </div>
+          {% endif %}
+        {% block nav %}{% endblock %}
+      </nav>
+      <header class="header">
+        <h1 class="headline">
+          {%block header %}
+          Dashboard
+          {% endblock %}
+        </h1>
+      </header>
+      <main class="main">
+          <div class="basis-3/4 maincontent">
+            {% block content %}{% endblock %}
+          </div>
+          
+          <div class="basis-1/4 sidebar">
+          {% if newsletters %}
+            <h2 class="columnheading">Newsletters</h2>
+            <ul>
+                {% for newsletter in newsletters %}
+                <li><a class="text-gray-900 block py-1 text-lg" href="/admin/newsletter/{{newsletter.key()}}">{{newsletter.number}} - {{newsletter.title}}</a></li>
+                {% endfor %}
+            </ul>
+          {%endif%}
+          </div>
+      </main>
   </body>
 </html>

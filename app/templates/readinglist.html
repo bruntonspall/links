@@ -1,21 +1,18 @@
 {% extends "base.html" %}
 {% import "macros.html" as macros %}
 
+{% block header %}
+Reading List
+{% endblock %}
 {% block content %}
-
-<div class="row">
-  <h3>Reading List</h3>
-</div>
-  {% for row in readinglist|batch(3) %}
-  <div class="row mb-1">
-    <div class="card-deck">
-    {% for link in row %}
-      {{ macros.link(link) }}
-    {% endfor %}
-  </div>
-</div>
+  <div class="grid sm:grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-4 ">
+  {% for link in readinglist %}
+    <div class="link">
+          {{ macros.link(link) }}
+    </div>
   {% else %}
-  <p>No links found</p>
+    <p>No links found</p>
   {% endfor %}
+  </div>
 
 {% endblock %}

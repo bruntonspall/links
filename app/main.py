@@ -169,7 +169,15 @@ def index():
     nl = Newsletter.most_recent_published()
     if not nl:
         nl = Newsletter(title="DEBUG NEWSLETTER", body="DEBUG DEBUG, DEBUG", number=-1)
-    return render_template("front/index.html", newsletter=nl, links=Link.by_newsletter(nl.key()), newsletters=Newsletter.list_published())
+    return render_template("front/index.html", newsletter=nl)
+
+
+@app.route('/archive')
+def archive():
+    nl = Newsletter.most_recent_published()
+    if not nl:
+        nl = Newsletter(title="DEBUG NEWSLETTER", body="DEBUG DEBUG, DEBUG", number=-1)
+    return render_template("front/archive.html", newsletter=nl, newsletters=Newsletter.list_published())
 
 
 @app.route('/<newsletterslug>')
@@ -189,8 +197,48 @@ def server_error(e):
 
 
 if __name__ == '__main__':
+    def import_from_file(fname):
+        import json
+        data = json.load(open(fname))
+        for nl in data['newsletters']:
+            logging.info(u"Parsing {}".format(nl))
+            # Change up the sent fields
+            if nl['sent']:
+                nl['sentdate'] = nl['sent']
+                nl['sent'] = True
+
+            n = Newsletter.from_dict(nl)
+            n.body = nl['intro']
+            n.slugify()
+            n.save()
+            key = n.key()
+            logging.info(u"Create newsletter {} - {}".format(n.number, n.title))
+            for sublink in nl['links']:
+                link = Link.from_dict(sublink)
+                link.newsletter = key
+                link.save()
+                logging.info(u"Create link {}".format(link.title))
+        for sublink in data['queue']:
+            link = Link.from_dict(sublink)
+            link.save()
+        for sublink in data['drafts']:
+            link = Link.from_dict(sublink)
+            link.save()
+        for sublink in data['readinglist']:
+            link = Link.from_dict(sublink)
+            link.save()
+
     logging.error("Starting up in local development mode")
+    logging.root.level = logging.INFO
     from mockfirestore import MockFirestore
     Database.db = MockFirestore()
-    app.config['LOGIN_DISABLED'] = True
+
+    @app.before_first_request
+    def login_test_user():
+        user = User.create("testuser", "test@test.com", "Test User", "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80")
+        login_user(user)
+    # app.config['LOGIN_DISABLED'] = True
+    import os
+    if os.path.exists("export.json"):
+        import_from_file("export.json")
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
