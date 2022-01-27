@@ -9,32 +9,32 @@ Edit Cyberweekly #{{newsletter.number}} - {{newsletter.title}}
       <form method="POST" enctype="multipart/form-data">
 
         <div class="form-group mb-6">
-          <label for="title" class="block mb-2 text-sm font-medium text-gray-900">Title</label>
-          <input type="text" name="title" id="title" value="{{newsletter.title}}" class="form-control bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"/>
+          <label for="title" class="">Title</label>
+          <input type="text" name="title" id="title" value="{{newsletter.title}}" class=""/>
         </div>
       
         <div class="form-group mb-6">
-          <label for="body" class="block mb-2 text-sm font-medium text-gray-900">Body</label>
-          <textarea name="body" id="body" rows=20 class="form-control bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">{{newsletter.body}}</textarea>
+          <label for="body" class="">Body</label>
+          <textarea name="body" id="body" rows=20 class="">{{newsletter.body}}</textarea>
         </div>
       
         <div class="form-group mb-6">
-          <label for="number" class="block mb-2 text-sm font-medium text-gray-900">Number</label>
-          <input type=number name="number" id="number" value="{{newsletter.number}}" class="form-control bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"/>
+          <label for="number" class="">Number</label>
+          <input type=number name="number" id="number" value="{{newsletter.number}}" class=""/>
         </div>
 
         {% if newsletter.sent %}
         <div class="form-group mb-6">
-          <label for="sent" class="block mb-2 text-sm font-medium text-gray-900">Sent</label>
-          <input type="text" name="sent" id="sent" value="{{newsletter.sentdate.date()}}" class="form-control bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"/>
+          <label for="sent" class="">Sent</label>
+          <input type="text" name="sent" id="sent" value="{{newsletter.sentdate.date()}}" class=""/>
         </div>
         {% endif %}
 
         <div class="form-group mb-6">
-          <label for="url" class="block mb-2 text-sm font-medium text-gray-900">URL</label>
-          <input type="text" name="url" id="url" value="{{newsletter.url}}" class="form-control bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"/>
+          <label for="url" class="">URL</label>
+          <input type="text" name="url" id="url" value="{{newsletter.url}}" class=""/>
         </div>
 
-      <button type="submit" class="btn btn-success text-white bg-sky-600 hover:bg-sky-700 focus:ring-4 focus:ring-sky-300 rounded-lg text-sm w-full px-5 py-2.5 text-center">Save</button>
+      <button type="submit" class="btn-primary">Save</button>
     </form>
 {% endblock %}

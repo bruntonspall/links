@@ -14,27 +14,27 @@ Edit a link
 <form method="POST" enctype="multipart/form-data">
 
   <div class="form-group mb-6">
-    <label for="title" class="block mb-2 text-sm font-medium text-gray-900">URL</label>
-    <input type="text" name="url" id="url" value="{{link.url}}" class="form-control bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"/>
+    <label for="title" class="">URL</label>
+    <input type="text" name="url" id="url" value="{{link.url}}" class="form-control "/>
   </div>
 
   <div class="form-group mb-6">
-    <label for="title" class="block mb-2 text-sm font-medium text-gray-900">Title</label>
-    <input type="text" name="title" id="title" value="{{link.title}}" class="form-control bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"/>
+    <label for="title" class="">Title</label>
+    <input type="text" name="title" id="title" value="{{link.title}}" class="form-control "/>
   </div>
 
   <div class="form-group mb-6">
-    <label for="quote" class="block mb-2 text-sm font-medium text-gray-900">Quote</label>
-    <textarea name="quote" id="quote" class="form-control bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" rows=5>{{link.quote}}</textarea>
+    <label for="quote" class="">Quote</label>
+    <textarea name="quote" id="quote" class="form-control " rows=5>{{link.quote}}</textarea>
   </div>
 
   <div class="form-group mb-6">
-    <label for="comment" class="block mb-2 text-sm font-medium text-gray-900">Note</label>
-    <textarea name="note" id="note" class="form-control bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" rows=5>{{link.note}}</textarea>
+    <label for="comment" class="">Note</label>
+    <textarea name="note" id="note" class="form-control " rows=5>{{link.note}}</textarea>
   </div>
   <div class="form-group mb-6">
-    <label for="linktype" class="block mb-2 text-sm font-medium text-gray-900">Status</label>
-    <select class="form-control bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" id="linktype" name="linktype">
+    <label for="linktype" class="">Status</label>
+    <select class="form-control " id="linktype" name="linktype">
       <option value=0 {% if link.type == 0%}selected{%endif%}>To Read</option>
       <option value=1 {% if link.type == 1%}selected{%endif%}>Draft</option>
       <option value=2 {% if link.type == 2%}selected{%endif%}>Queued</option>
@@ -42,7 +42,7 @@ Edit a link
       <option value=4 {% if link.type == 4%}selected{%endif%}>Deleted</option>
     </select>
   </div>
-  <button type="submit" class="btn btn-success text-white bg-sky-600 hover:bg-sky-700 focus:ring-4 focus:ring-sky-300 rounded-lg text-sm w-full px-5 py-2.5 text-center">Save</button>
+  <button type="submit" class="btn-primary">Save</button>
 </form>
 
 {% endblock %}

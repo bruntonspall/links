@@ -7,31 +7,28 @@
     <link rel="stylesheet" href="{{url_for('static',filename='css/main.css')}}">
     </head>
   <body class="bg-gray-300">
-    <nav class="bg-gray-800">
-      <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-        <div class="flex flex-col md:flex-row items-center justify-between">
-          <div class="flex-1 flex flex-col md:flex-row items-center justify-center sm:items-stretch sm:justify-start">              
-            <a href="/" class="text-gray-300 px-3 py-4 rounded-md text-lg font-medium h-16">Cyber Weekly</a>
-            <a href="/{{newsletter.slugify()}}" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-4 rounded-md text-lg font-medium">Latest issue</a>
-            <a href="/archive" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-4 rounded-md text-lg font-medium">Archive</a>
+    <nav class="navbar">
+
+          <div class="navbar-menu">              
+            <a href="/" class="navbar-link">Cyber Weekly</a>
+            <a href="/{{newsletter.slugify()}}" class="navbar-link">Latest issue</a>
+            <a href="/archive" class="navbar-link">Archive</a>
             {% if current_user.is_authenticated %}
-            <a href="/admin/index" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-4 rounded-md text-lg font-medium">Admin</a>
-            <a href="/admin/link/add" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-4 rounded-md text-lg font-medium">Add Item</a>
-            <a href="/admin/readinglist" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-4 rounded-md text-lg font-medium">Reading List</a>
+            <a href="/admin/index" class="navbar-link">Admin</a>
+            <a href="/admin/link/add" class="navbar-link">Add Item</a>
+            <a href="/admin/readinglist" class="navbar-link">Reading List</a>
             {% endif %}
           </div>
           {% if current_user.is_authenticated %}
-          <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-              <div class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-lg font-medium">{{current_user.name}}</div> 
+          <div class="navbar-user">
+              <div class="navbar-link">{{current_user.name}}</div> 
               <img class="h-8 w-8 rounded-full" src="{{current_user.picture}}"/>
-              <a class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-lg font-medium" href="/logout">Logout</a>
+              <a class="navbar-link" href="/logout">Logout</a>
             </div>
             {% endif %}
           {% block nav %}{% endblock %}
-        </div>
-      </div>
     </nav>
-    <main class="bg-gray-300 mx-auto my-none h-full py-8 px-6 sm:px-4 lg:px-8 max-w-full">
+    <main class="main">
       <div class="flex flex-col md:flex-row">
         {% block content %}{% endblock %}
       </div>

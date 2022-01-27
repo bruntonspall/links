@@ -153,6 +153,7 @@ tags
 # Persistent undo
 [._]*.un~
 
+node_modules
 # App specific files
 # Exports
 export

@@ -6,7 +6,7 @@
 
 <div class="grid lg:grid-cols-2 sm:grid-cols-1">
   <div class="p-2">
-      <h3 class="text-2xl font-bold text-gray-900 mb-4">Draft: {{links|length}}</h3>
+      <h3 class="columnheading">Draft: {{links|length}}</h3>
       {% for link in links %}
           {{ macros.link(link) }}
       {% else %}
@@ -14,9 +14,9 @@
       {% endfor %}
   </div>
   <div class="p-2">
-      <h3 class="text-2xl font-bold text-gray-900 mb-4">Queued: {{queue|length}}</h3>
-      <form action="/admin/newsletter/create" method="post" class="bg-gray-200 rounded-lg py-4 px-2 mb-4">
-        <button type="submit" class="inline-flex items-center bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 py-2 px-4 text-sm font-medium text-white border-slate-700 rounded-lg">Create Newsletter</button>
+      <h3 class="columnheading">Queued: {{queue|length}}</h3>
+      <form action="/admin/newsletter/create" method="post" class="card-header mb-4">
+        <button type="submit" class="btn-primary">Create Newsletter</button>
       </form>
       {% for link in queue %}
         {{ macros.link(link) }}
