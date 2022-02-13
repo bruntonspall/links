@@ -5,8 +5,52 @@ import logging
 import json
 import twitter
 import flask.json
+import datetime
+from notion_client import Client
+
 
 fetch = Blueprint('fetch', __name__)
+
+
+@fetch.route("/")
+def fetch_index():
+    settings = {
+        "pinboard_auth": Settings.get('PINBOARD_TOKEN'),
+        "pinboard_last": Settings.get('PINBOARD_LAST', default=None),
+        "consumerkey": Settings.get('TWITTER_CONSUMER_KEY'),
+        "consumersecret": Settings.get('TWITTER_CONSUMER_SECRET'),
+        "accesskey": Settings.get('TWITTER_ACCESS_KEY'),
+        "accesssecret": Settings.get('TWITTER_ACCESS_SECRET'),
+        "twitter_last": Settings.get('TWITTER_LAST', default=None),
+        "notion_auth": Settings.get('NOTION_TOKEN'),
+        "notion_db": Settings.get('NOTION_DB'),
+        "notion_tag": Settings.get('NOTION_TAG'),
+        "notion_last": Settings.get('NOTION_LASTRUN', default=None)
+    }
+    return render_template("fetch.html", settings=settings)
+
+
+@fetch.route("/settings/pinboard", methods=["POST"])
+def update_pinboard_settings():
+    Settings.set('PINBOARD_TOKEN', request.values.get('pinboard_auth'))
+    return redirect("/admin/fetch/")
+
+
+@fetch.route("/settings/twitter", methods=["POST"])
+def update_twitter_settings():
+    Settings.set('TWITTER_CONSUMER_KEY', request.values.get('consumerkey'))
+    Settings.set('TWITTER_CONSUMER_SECRET', request.values.get('consumersecret'))
+    Settings.set('TWITTER_ACCESS_KEY', request.values.get('accesskey'))
+    Settings.set('TWITTER_ACCESS_SECRET', request.values.get('accesssecret'))
+    return redirect("/admin/fetch/")
+
+
+@fetch.route("/settings/notion", methods=["POST"])
+def update_notion_settings():
+    Settings.set('NOTION_TOKEN', request.values.get('notion_auth'))
+    Settings.set('NOTION_DB', request.values.get('notion_db'))
+    Settings.set('NOTION_TAG', request.values.get('notion_tag'))
+    return redirect("/admin/fetch/")
 
 
 @fetch.route('/pinboard')
@@ -35,10 +79,119 @@ def fetch_pinboard():
                 title=item['description'],
                 note=item['extended'],
                 type=0
-                ).put()
+                ).save()
                 count += 1
-        return 'Processed {} items'.format(count)
-    return 'No new items to process'
+    logging.info(f"Processed {count} items")
+    return redirect("/admin/fetch/")
+
+
+def notion_richtext_to_markdown(block):
+    md = ""
+    for subblock in block:
+        prefix = ""
+        suffix = ""
+        text = subblock["text"]["content"]
+        if subblock["annotations"]["bold"]:
+            prefix += "**"
+            suffix += "**"
+            
+        if subblock["annotations"]["italic"]:
+            prefix += "_"
+            suffix += "_"
+        if subblock["annotations"]["code"]:
+            prefix += "`"
+            suffix += "`"
+        if subblock["annotations"]["strikethrough"]:
+            prefix += "~~"
+            suffix += "~~"
+        md += f"{prefix}{text.strip()}{suffix} "
+    logging.info(f"Formatting {json.dumps(block, indent=2)} into {md}")
+    return md
+
+
+@fetch.route('/notion')
+def fetch_notion():
+    authtoken = Settings.get('NOTION_TOKEN')
+    tag = Settings.get('NOTION_TAG', default="CyberWeeklyImport")
+    db = Settings.get('NOTION_DB')
+    lastrun = Settings.get('NOTION_LASTRUN', default=None)
+    logging.info(f"Fetching from notion {db} with token {authtoken}")
+    notion = Client(auth=authtoken)
+
+    if lastrun:
+        since = {"after": lastrun}
+    else:
+        since = {"past_week": {}}
+
+    importtime = datetime.datetime.now().isoformat()
+    count = 0
+
+    # Process items that have been editing in the last week, but already tagged
+    query = {
+        "and": [
+            {"property": "Edited", "date": since},
+        ]}
+    logging.info(f"Fetching from Notion with query {query}")
+
+    existing_items = notion.databases.query(database_id=db, filter=query)
+
+    for result in existing_items["results"]:
+        if "Imported" in result["properties"] and result["properties"]["Imported"]["date"]:
+            lastimported = datetime.datetime.fromisoformat(result["properties"]["Imported"]["date"]["start"])
+        else:
+            lastimported = datetime.datetime.fromisoformat("1999-01-01T00:00:00.000+00:00")
+        edited = datetime.datetime.fromisoformat(result["properties"]["Edited"]["last_edited_time"].replace('Z', '+00:00'))
+        name = result['properties']['Name']['title'][0]['plain_text']
+        logging.info(f"Examining {name} - Edited {edited}, imported {lastimported}")
+
+        if edited > lastimported:  # Has it been touched in Notion since we last ran the import script?
+            url = result['properties']['URL']['url']
+            comment = notion_richtext_to_markdown(result['properties']['Comment']['rich_text'])
+            quote = notion_richtext_to_markdown(result['properties']['Quote']['rich_text'])
+            title = notion_richtext_to_markdown(result['properties']['Name']['title'])
+            existing = Link.get_by_url(url)
+            if not existing:
+                Link(
+                    url=url,
+                    title=title,
+                    quote=quote,
+                    note=comment,
+                    type=0
+                ).save()
+                count += 1
+                logging.info(f"Creating {name}")
+                tags = result['properties']['Tags']
+                if filter(lambda t: t["name"] == tag, tags["multi_select"]):
+                    tags['multi_select'].append({'name': tag})
+                imported = {"date": {"start": importtime}}
+                print(f"Setting imported to {importtime}")
+                notion.pages.update(page_id=result['id'], properties={'Tags': tags, 'Imported': imported})
+            else:
+                # We've seen this before somewhere, so we need to work out whether to update it or not
+                # Never touch live links, or links that are in a newsletter
+                if existing.type == Link.SENT or existing.newsletter:
+                    logging.info(f"{name} was already sent in newsletter {existing.newsletter}")
+                else:
+                    if existing.stored > edited:
+                        logging.info(f"{name} was updated in Cyberweekly({existing.stored}) more recently than in Notion {edited}")
+                    else:
+                        existing.title = title
+                        existing.quote = quote
+                        existing.note = comment
+                        existing.save()
+                        count += 1
+                        tags = result['properties']['Tags']
+                        if filter(lambda t: t["name"] == tag, tags["multi_select"]):
+                            tags['multi_select'].append({'name': tag})
+                        imported = {"date": {"start": importtime}}
+                        print(f"Updated, so setting Imported to {importtime}")
+                        notion.pages.update(page_id=result['id'], properties={'Tags': tags, 'Imported': imported})
+        else:
+            logging.info("Hasn't been edited since importing, so skipping")
+
+    Settings.set('NOTION_LASTRUN', importtime)
+    logging.info(f"Processed {count} items")
+    return redirect("/admin/fetch/")
 
 
 @fetch.route('/twitter')

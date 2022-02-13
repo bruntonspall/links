@@ -58,3 +58,10 @@
 </div>
 
 {%- endmacro %}
+
+{%- macro textinput(id, name, value) -%}
+<div class="form-group mb-6">
+  <label for="{{id}}" class="">{{name}}</label>
+  <input type="text" name="{{id}}" id="{{id}}" value="{{value}}" class=""/>
+</div>
+{%- endmacro %}

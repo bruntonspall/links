@@ -11,3 +11,4 @@ google-cloud-firestore
 mock-firestore
 Flask-Login
 gunicorn
+notion-client

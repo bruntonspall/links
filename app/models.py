@@ -1,6 +1,6 @@
 from google.cloud import firestore
 from slugify import slugify
-from datetime import datetime
+from datetime import datetime, timezone
 from flask_login import UserMixin
 import uuid
 
@@ -198,8 +198,8 @@ class Link:
 
     def __init__(self, url, type, title="", note="", quote="", source="", newsletter=None):
         self.key = str(uuid.uuid4())
-        self.stored = datetime.now()
-        self.updated = datetime.now()
+        self.stored = datetime.now(timezone.utc)
+        self.updated = datetime.now(timezone.utc)
         self.url = url
         self.type = type
         self.title = title
@@ -212,8 +212,16 @@ class Link:
     def from_dict(source):
         link = Link(url=source['url'], type=source['type'], title=source['title'], note=source['note'], quote=source['quote'], source=source['source'])
         link.key = source.get('key', str(uuid.uuid4()))
-        link.stored = source['stored']
-        link.updated = source['updated']
+        
+        if not isinstance(source['stored'], datetime):
+            link.stored = datetime.fromisoformat(source['stored'])
+        else:
+            link.stored = source['stored'].replace(tzinfo=timezone.utc)
+        
+        if not isinstance(source['updated'], datetime):
+            link.updated = datetime.fromisoformat(source['updated'])
+        else:
+            link.updated = source['updated'].replace(tzinfo=timezone.utc)
         link.newsletter = source.get('newsletter', None)
         return link
 

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block header %}
+Fetch Articles
+{% endblock %}
+{% block content %}
+<form method="POST" enctype="multipart/form-data" action="/admin/fetch/settings/pinboard">
+
+  {{ macros.textinput("pinboard_auth", "Pinboard Token", settings.pinboard_auth)}}
+  {{ macros.textinput("pinboard_last", "Last Refreshed", settings.pinboard_last)}}
+  <button type="submit" class="btn-primary">Save</button>
+  <a href="/admin/fetch/pinboard" class="btn">Fetch</a>
+</form>
+<form method="POST" enctype="multipart/form-data" action="/admin/fetch/settings/twitter">
+
+  {{ macros.textinput("consumerkey", "Twitter Consumer Key", settings.consumerkey)}}
+  {{ macros.textinput("consumersecret", "Twitter Consumer Secret", settings.consumersecret)}}
+  {{ macros.textinput("accesskey", "Twitter Access Key", settings.accesskey)}}
+  {{ macros.textinput("accesssecret", "Twitter Access Secret", settings.accesssecret)}}
+  {{ macros.textinput("twitter_last", "Last Refreshed", settings.twitter_last)}}
+  <button type="submit" class="btn-primary">Save</button>
+  <a href="/admin/fetch/twitter" class="btn">Fetch</a>
+</form>
+<form method="POST" enctype="multipart/form-data" action="/admin/fetch/settings/notion">
+
+  {{ macros.textinput("notion_auth", "Notion Token", settings.notion_auth)}}
+  {{ macros.textinput("notion_db", "Notion DB", settings.notion_db)}}
+  {{ macros.textinput("notion_tag", "Notion Tag", settings.notion_tag)}}
+  {{ macros.textinput("notion_last", "Last REfreshed", settings.notion_last)}}
+  <button type="submit" class="btn-primary">Save</button>
+  <a href="/admin/fetch/notion" class="btn">Fetch</a>
+
+</form>
+
+
+{% endblock %}
