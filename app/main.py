@@ -219,13 +219,13 @@ if __name__ == '__main__':
                 link.save()
                 logging.info(u"Create link {}".format(link.title))
         for sublink in data['queue']:
-            link = Link.from_dict(sublink)
+            link = Link.from_json(sublink)
             link.save()
         for sublink in data['drafts']:
-            link = Link.from_dict(sublink)
+            link = Link.from_json(sublink)
             link.save()
         for sublink in data['readinglist']:
-            link = Link.from_dict(sublink)
+            link = Link.from_json(sublink)
             link.save()
 
     logging.error("Starting up in local development mode")
