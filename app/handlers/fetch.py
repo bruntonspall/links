@@ -6,13 +6,17 @@ import json
 import twitter
 import flask.json
 import datetime
+import logging
 from notion_client import Client
-from google.cloud import logging
+import google.cloud.logging
+
 
 
 fetch = Blueprint('fetch', __name__)
-logging_client = logging.Client()
+logging_client = google.cloud.logging.Client()
 logger = logging_client.logger("fetch")
+logging_client.setup_logging()
+
 
 
 @fetch.route("/")
@@ -30,7 +34,7 @@ def fetch_index():
         "notion_tag": Settings.get('NOTION_TAG'),
         "notion_last": Settings.get('NOTION_LASTRUN', default=None)
     }
-    logger.info(settings)
+    logging.info(settings)
     return render_template("fetch.html", settings=settings)
 
 
@@ -61,7 +65,7 @@ def update_notion_settings():
 def fetch_pinboard():
     authtoken = Settings.get('PINBOARD_TOKEN')
     lastfetch = Settings.get('PINBOARD_LAST')
-    logger.error("Fetching api with token {}".format(authtoken))
+    logging.error("Fetching api with token {}".format(authtoken))
 
     dt = requests.get('https://api.pinboard.in/v1/posts/update',params={
     'format':'json',
@@ -85,7 +89,7 @@ def fetch_pinboard():
                 type=0
                 ).save()
                 count += 1
-    logger.info(f"Processed {count} items")
+    logging.info(f"Processed {count} items")
     return redirect("/admin/fetch/")
 
 
@@ -134,7 +138,7 @@ def fetch_notion():
     tag = Settings.get('NOTION_TAG', default="CyberWeeklyImport")
     db = Settings.get('NOTION_DB')
     lastrun = Settings.get('NOTION_LASTRUN', default=None)
-    logger.info(f"Fetching from notion {db} with token {authtoken}")
+    logging.info(f"Fetching from notion {db} with token {authtoken}")
     notion = Client(auth=authtoken)
 
     if lastrun:
@@ -150,7 +154,7 @@ def fetch_notion():
         "and": [
             {"property": "Edited", "date": since},
         ]}
-    logger.info(f"Fetching from Notion with query {query}")
+    logging.info(f"Fetching from Notion with query {query}")
 
     existing_items = notion.databases.query(database_id=db, filter=query)
 
@@ -161,7 +165,7 @@ def fetch_notion():
             lastimported = datetime.datetime.fromisoformat("1999-01-01T00:00:00.000+00:00")
         edited = datetime.datetime.fromisoformat(result["properties"]["Edited"]["last_edited_time"].replace('Z', '+00:00'))
         name = result['properties']['Name']['title'][0]['plain_text']
-        logger.info(f"Examining {name} - Edited {edited}, imported {lastimported}")
+        logging.info(f"Examining {name} - Edited {edited}, imported {lastimported}")
 
         if edited > lastimported:  # Has it been touched in Notion since we last ran the import script?
             url = result['properties']['URL']['url']
@@ -179,7 +183,7 @@ def fetch_notion():
                     type=0
                 ).save()
                 count += 1
-                logger.info(f"Creating {name}")
+                logging.info(f"Creating {name}")
                 tags = result['properties']['Tags']
                 if filter(lambda t: t["name"] == tag, tags["multi_select"]):
                     tags['multi_select'].append({'name': tag})
@@ -190,10 +194,10 @@ def fetch_notion():
                 # We've seen this before somewhere, so we need to work out whether to update it or not
                 # Never touch live links, or links that are in a newsletter
                 if existing.type == Link.SENT or existing.newsletter:
-                    logger.info(f"{name} was already sent in newsletter {existing.newsletter}")
+                    logging.info(f"{name} was already sent in newsletter {existing.newsletter}")
                 else:
                     if existing.stored > edited:
-                        logger.info(f"{name} was updated in Cyberweekly({existing.stored}) more recently than in Notion {edited}")
+                        logging.info(f"{name} was updated in Cyberweekly({existing.stored}) more recently than in Notion {edited}")
                     else:
                         existing.title = title
                         existing.quote = quote
@@ -207,10 +211,10 @@ def fetch_notion():
                         print(f"Updated, so setting Imported to {importtime}")
                         notion.pages.update(page_id=result['id'], properties={'Tags': tags, 'Imported': imported})
         else:
-            logger.info("Hasn't been edited since importing, so skipping")
+            logging.info("Hasn't been edited since importing, so skipping")
 
     Settings.set('NOTION_LASTRUN', importtime)
-    logger.info(f"Processed {count} items")
+    logging.info(f"Processed {count} items")
     return redirect("/admin/fetch/")
 
 
