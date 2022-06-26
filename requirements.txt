@@ -8,6 +8,7 @@ python-slugify
 Flask-Markdown
 python-dateutil
 google-cloud-firestore
+google-cloud-logging
 mock-firestore
 Flask-Login
 gunicorn

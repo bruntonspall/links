@@ -1,7 +1,9 @@
+from os import environ
 from models import Newsletter, Link, Settings
 from flask import request, render_template, redirect, url_for, Blueprint
 import requests
 import logging
+from google.cloud import logging
 import json
 import twitter
 import flask.json
@@ -10,6 +12,9 @@ from notion_client import Client
 
 
 fetch = Blueprint('fetch', __name__)
+if environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
+    logging_client = logging.Client()
+    logger = logging_client.logger("fetch")
 
 
 @fetch.route("/")
@@ -105,7 +110,7 @@ def notion_richtext_to_markdown(block):
         if subblock["annotations"]["strikethrough"]:
             prefix += "~~"
             suffix += "~~"
-        if subblock["link"]:
+        if "link" in subblock:
             prefix += "["
             suffix += "]("+subblock["link"]["url"]+")"
         if prefix == "" and suffix == "":
@@ -120,7 +125,7 @@ def notion_richtext_to_markdown(block):
             # This is't just content, so unset prev_text
             prev_text = False
         md += f"{prefix}{text.strip()}{suffix} "
-    logging.warn(f"Formatting {json.dumps(block)} into {md}")
+    logger.log_struct({"entry": "convert", "input": block, "markdown": md})
     return md
 
 
@@ -161,7 +166,7 @@ def fetch_notion():
 
         if edited > lastimported:  # Has it been touched in Notion since we last ran the import script?
             url = result['properties']['URL']['url']
-            logging.warn("Quote: "+json.dumps(result['properties']['Quote']))
+            logger.log_struct({"entry": url, "NotionObject": result})
             comment = notion_richtext_to_markdown(result['properties']['Comment']['rich_text'])
             quote = notion_richtext_to_markdown(result['properties']['Quote']['rich_text'])
             title = notion_richtext_to_markdown(result['properties']['Name']['title'])
