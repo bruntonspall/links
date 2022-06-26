@@ -7,16 +7,12 @@ import twitter
 import flask.json
 import datetime
 from notion_client import Client
+from google.cloud import logging
 
 
 fetch = Blueprint('fetch', __name__)
-if environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
-    from google.cloud import logging
-    logging_client = logging.Client()
-    logger = logging_client.logger("fetch")
-else:
-    import logging
-    logger = logging
+logging_client = logging.Client()
+logger = logging_client.logger("fetch")
 
 
 @fetch.route("/")
