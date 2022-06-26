@@ -87,6 +87,7 @@ def fetch_pinboard():
 
 def notion_richtext_to_markdown(block):
     md = ""
+    prev_text = False
     for subblock in block:
         prefix = ""
         suffix = ""
@@ -104,11 +105,22 @@ def notion_richtext_to_markdown(block):
         if subblock["annotations"]["strikethrough"]:
             prefix += "~~"
             suffix += "~~"
+        if subblock["link"]:
+            prefix += "["
+            suffix += "]("+subblock["link"]["url"]+")"
         if prefix == "" and suffix == "":
-            # There's no annotations, so this is just content, so end it with a new paragraph
-            suffix = "\n\n"
+            # There's no annotations, so this is just content.
+            # If the previous one was just content, then it's a new paragraph, so end it with a new paragraph
+            if prev_text:
+                suffix = "\n\n"
+            else:
+                # This is just content so set prev_text
+                prev_text = True
+        else:
+            # This is't just content, so unset prev_text
+            prev_text = False
         md += f"{prefix}{text.strip()}{suffix} "
-    logging.warn(f"Formatting {json.dumps(block, indent=2)} into {md}")
+    logging.warn(f"Formatting {json.dumps(block)} into {md}")
     return md
 
 
@@ -149,6 +161,7 @@ def fetch_notion():
 
         if edited > lastimported:  # Has it been touched in Notion since we last ran the import script?
             url = result['properties']['URL']['url']
+            logging.warn("Quote: "+json.dumps(result['properties']['Quote']))
             comment = notion_richtext_to_markdown(result['properties']['Comment']['rich_text'])
             quote = notion_richtext_to_markdown(result['properties']['Quote']['rich_text'])
             title = notion_richtext_to_markdown(result['properties']['Name']['title'])
