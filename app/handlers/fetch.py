@@ -108,7 +108,7 @@ def notion_richtext_to_markdown(block):
             # There's no annotations, so this is just content, so end it with a new paragraph
             suffix = "\n\n"
         md += f"{prefix}{text.strip()}{suffix} "
-    logging.info(f"Formatting {json.dumps(block, indent=2)} into {md}")
+    logging.warn(f"Formatting {json.dumps(block, indent=2)} into {md}")
     return md
 
 
