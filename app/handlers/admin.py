@@ -5,7 +5,7 @@ from models.link import Link
 from repositories import links_repo, newsletter_repo
 from flask import Blueprint, request
 import json
-import logging 
+import logging
 
 admin = Blueprint('admin', __name__)
 
