@@ -8,12 +8,10 @@ from flask import Flask
 from models.newsletter import Newsletter
 from models.link import Link
 from models.database import Database
-from models.user import User
 from flask import render_template, request, url_for, redirect
 from flaskext.markdown import Markdown
 
-from repositories import links_repo, newsletter_repo
-from services import links_service, newsletter_service
+from repositories import links_repo, newsletter_repo, user_repo
 
 from handlers.admin import admin
 from handlers.newsletter import newsletter
@@ -60,7 +58,7 @@ ALLOWED_USERS = ["michael@brunton-spall.co.uk", "joel@slash32.co.uk"]
 # Flask-Login helper to retrieve a user from our db
 @login_manager.user_loader
 def load_user(user_id):
-    return User.get(user_id)
+    return user_repo.get(user_id)
 
 
 @app.route('/admin/index')
@@ -144,9 +142,9 @@ def callback():
     # by Google
 
     # Doesn't exist? Add it to the database.
-    user = User.get(unique_id)
+    user = user_repo.get(unique_id)
     if not user:
-        user = User.create(unique_id, users_email, users_name, picture)
+        user = user_repo.create(unique_id, users_email, users_name, picture)
 
     # Begin user session by logging the user in
     login_user(user, remember=True, duration=timedelta(days=6))
@@ -241,7 +239,7 @@ if __name__ == '__main__':
 
     @app.before_first_request
     def login_test_user():
-        user = User.create("testuser", "test@test.com", "Test User", "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80")
+        user = user_repo.create("testuser", "test@test.com", "Test User", "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80")
         login_user(user)
     # app.config['LOGIN_DISABLED'] = True
     import os
