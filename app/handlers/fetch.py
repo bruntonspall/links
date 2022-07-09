@@ -1,39 +1,29 @@
-from os import environ
-from models import Newsletter, Link, Settings
-from flask import request, render_template, redirect, url_for, Blueprint
+from models.link import Link
+from repositories import settings_repo, links_repo
+from flask import request, render_template, redirect, Blueprint
 import requests
-import json
 import twitter
-import flask.json
 import datetime
 import logging
 from fetchutils import notion_richtext_to_markdown
 from notion_client import Client
-import google.cloud.logging
-
-
-
 fetch = Blueprint('fetch', __name__)
-logging_client = google.cloud.logging.Client()
-logger = logging_client.logger("fetch")
-logging_client.setup_logging()
-
 
 
 @fetch.route("/")
 def fetch_index():
     settings = {
-        "pinboard_auth": Settings.get('PINBOARD_TOKEN'),
-        "pinboard_last": Settings.get('PINBOARD_LAST', default=None),
-        "consumerkey": Settings.get('TWITTER_CONSUMER_KEY'),
-        "consumersecret": Settings.get('TWITTER_CONSUMER_SECRET'),
-        "accesskey": Settings.get('TWITTER_ACCESS_KEY'),
-        "accesssecret": Settings.get('TWITTER_ACCESS_SECRET'),
-        "twitter_last": Settings.get('TWITTER_LAST', default=None),
-        "notion_auth": Settings.get('NOTION_TOKEN'),
-        "notion_db": Settings.get('NOTION_DB'),
-        "notion_tag": Settings.get('NOTION_TAG'),
-        "notion_last": Settings.get('NOTION_LASTRUN', default=None)
+        "pinboard_auth": settings_repo.get('PINBOARD_TOKEN'),
+        "pinboard_last": settings_repo.get('PINBOARD_LAST', default=None),
+        "consumerkey": settings_repo.get('TWITTER_CONSUMER_KEY'),
+        "consumersecret": settings_repo.get('TWITTER_CONSUMER_SECRET'),
+        "accesskey": settings_repo.get('TWITTER_ACCESS_KEY'),
+        "accesssecret": settings_repo.get('TWITTER_ACCESS_SECRET'),
+        "twitter_last": settings_repo.get('TWITTER_LAST', default=None),
+        "notion_auth": settings_repo.get('NOTION_TOKEN'),
+        "notion_db": settings_repo.get('NOTION_DB'),
+        "notion_tag": settings_repo.get('NOTION_TAG'),
+        "notion_last": settings_repo.get('NOTION_LASTRUN', default=None)
     }
     logging.info(settings)
     return render_template("fetch.html", settings=settings)
@@ -41,54 +31,54 @@ def fetch_index():
 
 @fetch.route("/settings/pinboard", methods=["POST"])
 def update_pinboard_settings():
-    Settings.set('PINBOARD_TOKEN', request.values.get('pinboard_auth'))
+    settings_repo.set('PINBOARD_TOKEN', request.values.get('pinboard_auth'))
     return redirect("/admin/fetch/")
 
 
 @fetch.route("/settings/twitter", methods=["POST"])
 def update_twitter_settings():
-    Settings.set('TWITTER_CONSUMER_KEY', request.values.get('consumerkey'))
-    Settings.set('TWITTER_CONSUMER_SECRET', request.values.get('consumersecret'))
-    Settings.set('TWITTER_ACCESS_KEY', request.values.get('accesskey'))
-    Settings.set('TWITTER_ACCESS_SECRET', request.values.get('accesssecret'))
+    settings_repo.set('TWITTER_CONSUMER_KEY', request.values.get('consumerkey'))
+    settings_repo.set('TWITTER_CONSUMER_SECRET', request.values.get('consumersecret'))
+    settings_repo.set('TWITTER_ACCESS_KEY', request.values.get('accesskey'))
+    settings_repo.set('TWITTER_ACCESS_SECRET', request.values.get('accesssecret'))
     return redirect("/admin/fetch/")
 
 
 @fetch.route("/settings/notion", methods=["POST"])
 def update_notion_settings():
-    Settings.set('NOTION_TOKEN', request.values.get('notion_auth'))
-    Settings.set('NOTION_DB', request.values.get('notion_db'))
-    Settings.set('NOTION_TAG', request.values.get('notion_tag'))
+    settings_repo.set('NOTION_TOKEN', request.values.get('notion_auth'))
+    settings_repo.set('NOTION_DB', request.values.get('notion_db'))
+    settings_repo.set('NOTION_TAG', request.values.get('notion_tag'))
     return redirect("/admin/fetch/")
 
 
 @fetch.route('/pinboard')
 def fetch_pinboard():
-    authtoken = Settings.get('PINBOARD_TOKEN')
-    lastfetch = Settings.get('PINBOARD_LAST')
+    authtoken = settings_repo.get('PINBOARD_TOKEN')
+    lastfetch = settings_repo.get('PINBOARD_LAST')
     logging.error("Fetching api with token {}".format(authtoken))
 
-    dt = requests.get('https://api.pinboard.in/v1/posts/update',params={
-    'format':'json',
-    'auth_token':authtoken,
+    dt = requests.get('https://api.pinboard.in/v1/posts/update', params={
+        'format': 'json',
+        'auth_token': authtoken,
     }).json()
     if 'update_time' in dt and dt['update_time'] != lastfetch:
-        Settings.set('PINBOARD_LAST', dt['update_time'])
-        d = requests.get('http://api.pinboard.in/v1/posts/all',params={
-            'format':'json',
-            'results':'75',
-            'tag':'newsletter',
-            'auth_token':authtoken
+        settings_repo.set('PINBOARD_LAST', dt['update_time'])
+        d = requests.get('http://api.pinboard.in/v1/posts/all', params={
+            'format': 'json',
+            'results': '75',
+            'tag': 'newsletter',
+            'auth_token': authtoken
         }).json()
         count = 0
         for item in d:
-            if not Link.get_by_url(item['href']):
-                Link(
-                url=item['href'],
-                title=item['description'],
-                note=item['extended'],
-                type=0
-                ).save()
+            if not links_repo.get_by_url(item['href']):
+                links_repo.save(Link(
+                    url=item['href'],
+                    title=item['description'],
+                    note=item['extended'],
+                    type=0
+                ))
                 count += 1
     logging.info(f"Processed {count} items")
     return redirect("/admin/fetch/")
@@ -96,10 +86,10 @@ def fetch_pinboard():
 
 @fetch.route('/notion')
 def fetch_notion():
-    authtoken = Settings.get('NOTION_TOKEN')
-    tag = Settings.get('NOTION_TAG', default="CyberWeeklyImport")
-    db = Settings.get('NOTION_DB')
-    lastrun = Settings.get('NOTION_LASTRUN', default=None)
+    authtoken = settings_repo.get('NOTION_TOKEN')
+    tag = settings_repo.get('NOTION_TAG', default="CyberWeeklyImport")
+    db = settings_repo.get('NOTION_DB')
+    lastrun = settings_repo.get('NOTION_LASTRUN', default=None)
     logging.info(f"Fetching from notion {db} with token {authtoken}")
     notion = Client(auth=authtoken)
 
@@ -131,19 +121,19 @@ def fetch_notion():
 
         if edited > lastimported:  # Has it been touched in Notion since we last ran the import script?
             url = result['properties']['URL']['url']
-            logger.log_struct({"entry": url, "NotionObject": result})
+            # logger.log_struct({"entry": url, "NotionObject": result})
             comment = notion_richtext_to_markdown(result['properties']['Comment']['rich_text'])
             quote = notion_richtext_to_markdown(result['properties']['Quote']['rich_text'])
             title = notion_richtext_to_markdown(result['properties']['Name']['title'])
             existing = Link.get_by_url(url)
             if not existing:
-                Link(
+                links_repo.save(Link(
                     url=url,
                     title=title,
                     quote=quote,
                     note=comment,
                     type=0
-                ).save()
+                ))
                 count += 1
                 logging.info(f"Creating {name}")
                 tags = result['properties']['Tags']
@@ -155,7 +145,7 @@ def fetch_notion():
             else:
                 # We've seen this before somewhere, so we need to work out whether to update it or not
                 # Never touch live links, or links that are in a newsletter
-                if existing.type == Link.SENT or existing.newsletter:
+                if existing.type == links_repo.SENT or existing.newsletter:
                     logging.info(f"{name} was already sent in newsletter {existing.newsletter}")
                 else:
                     if existing.stored > edited:
@@ -164,7 +154,7 @@ def fetch_notion():
                         existing.title = title
                         existing.quote = quote
                         existing.note = comment
-                        existing.save()
+                        links_repo.save(existing)
                         count += 1
                         tags = result['properties']['Tags']
                         if filter(lambda t: t["name"] == tag, tags["multi_select"]):
@@ -175,25 +165,25 @@ def fetch_notion():
         else:
             logging.info("Hasn't been edited since importing, so skipping")
 
-    Settings.set('NOTION_LASTRUN', importtime)
+    settings_repo.set('NOTION_LASTRUN', importtime)
     logging.info(f"Processed {count} items")
     return redirect("/admin/fetch/")
 
 
 @fetch.route('/twitter')
 def fetch_twitter_favs():
-    consumerkey = Settings.get('TWITTER_CONSUMER_KEY')
-    consumersecret = Settings.get('TWITTER_CONSUMER_SECRET')
-    accesskey = Settings.get('TWITTER_ACCESS_KEY')
-    accesssecret = Settings.get('TWITTER_ACCESS_SECRET')
-    lastfetch = Settings.get('TWITTER_LAST', default="")
+    consumerkey = settings_repo.get('TWITTER_CONSUMER_KEY')
+    consumersecret = settings_repo.get('TWITTER_CONSUMER_SECRET')
+    accesskey = settings_repo.get('TWITTER_ACCESS_KEY')
+    accesssecret = settings_repo.get('TWITTER_ACCESS_SECRET')
+    lastfetch = settings_repo.get('TWITTER_LAST', default="")
     if not lastfetch:
         lastfetch = 0
 
     api = twitter.Api(consumer_key=consumerkey,
-                  consumer_secret=consumersecret,
-                  access_token_key=accesskey,
-                  access_token_secret=accesssecret)
+                      consumer_secret=consumersecret,
+                      access_token_key=accesskey,
+                      access_token_secret=accesssecret)
 
     favs = api.GetFavorites(screen_name='bruntonspall', include_entities=True, count=50, since_id=lastfetch)
     count = 0
@@ -201,13 +191,13 @@ def fetch_twitter_favs():
         for fav in favs:
             for u in fav.urls:
                 if not u.expanded_url.startswith("https://twitter.com/"):
-                    if not Link.get_by_url(u.expanded_url):
-                        Link(
-                        url=u.expanded_url,
-                        title=fav.text,
-                        note="Tweet: [https://twitter.com/{}/status{}]()".format(fav.user.screen_name, fav.id),
-                        type=0
-                        ).put()
+                    if not links_repo.get_by_url(u.expanded_url):
+                        links_repo.save(Link(
+                            url=u.expanded_url,
+                            title=fav.text,
+                            note="Tweet: [https://twitter.com/{}/status{}]()".format(fav.user.screen_name, fav.id),
+                            type=0
+                        ))
                         count += 1
-        Settings.set('TWITTER_LAST', favs[0].id_str)
+        settings_repo.set('TWITTER_LAST', favs[0].id_str)
     return 'Processed {} items'.format(count)

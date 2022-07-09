@@ -5,9 +5,13 @@ import requests
 import json
 
 from flask import Flask
-from models import Database, Newsletter, Link, User
+from models.newsletter import Newsletter
+from models.link import Link
+from models.database import Database
 from flask import render_template, request, url_for, redirect
 from flaskext.markdown import Markdown
+
+from repositories import links_repo, newsletter_repo, user_repo
 
 from handlers.admin import admin
 from handlers.newsletter import newsletter
@@ -54,13 +58,13 @@ ALLOWED_USERS = ["michael@brunton-spall.co.uk", "joel@slash32.co.uk"]
 # Flask-Login helper to retrieve a user from our db
 @login_manager.user_loader
 def load_user(user_id):
-    return User.get(user_id)
+    return user_repo.get(user_id)
 
 
 @app.route('/admin/index')
 @login_required
 def adminindex():
-    return render_template("adminlist.html", newsletters=Newsletter.list(), queue=Link.queued(), links=Link.drafts())
+    return render_template("adminlist.html", newsletters=newsletter_repo.list(), queue=links_repo.queued(), links=links_repo.drafts())
 
 
 def get_google_provider_cfg():
@@ -138,9 +142,9 @@ def callback():
     # by Google
 
     # Doesn't exist? Add it to the database.
-    user = User.get(unique_id)
+    user = user_repo.get(unique_id)
     if not user:
-        user = User.create(unique_id, users_email, users_name, picture)
+        user = user_repo.create(unique_id, users_email, users_name, picture)
 
     # Begin user session by logging the user in
     login_user(user, remember=True, duration=timedelta(days=6))
@@ -161,12 +165,12 @@ def logout():
 @app.route('/admin/readinglist')
 @login_required
 def reading():
-    return render_template("readinglist.html", newsletters=Newsletter.list(), readinglist=Link.toread())
+    return render_template("readinglist.html", newsletters=newsletter_repo.list(), readinglist=links_repo.toread())
 
 
 @app.route('/')
 def index():
-    nl = Newsletter.most_recent_published()
+    nl = newsletter_repo.most_recent_published()
     if not nl:
         nl = Newsletter(title="DEBUG NEWSLETTER", body="DEBUG DEBUG, DEBUG", number=-1)
     return render_template("front/index.html", newsletter=nl)
@@ -174,17 +178,17 @@ def index():
 
 @app.route('/archive')
 def archive():
-    nl = Newsletter.most_recent_published()
+    nl = newsletter_repo.most_recent_published()
     if not nl:
         nl = Newsletter(title="DEBUG NEWSLETTER", body="DEBUG DEBUG, DEBUG", number=-1)
-    return render_template("front/archive.html", newsletter=nl, newsletters=Newsletter.list_published())
+    return render_template("front/archive.html", newsletter=nl, newsletters=newsletter_repo.list_published())
 
 
 @app.route('/<newsletterslug>')
 def newsletter(newsletterslug):
-    nl = Newsletter.by_slug(newsletterslug)
+    nl = newsletter_repo.by_slug(newsletterslug)
     if nl:
-        return render_template("front/newsletter.html", newsletter=nl, links=Link.by_newsletter(nl.key()), newsletters=Newsletter.list_published())
+        return render_template("front/newsletter.html", newsletter=nl, links=links_repo.by_newsletter(nl.key()), newsletters=newsletter_repo.list_published())
     else:
         return 'No such newsletter', 404
 
@@ -210,23 +214,23 @@ if __name__ == '__main__':
             n = Newsletter.from_dict(nl)
             n.body = nl['intro']
             n.slugify()
-            n.save()
+            newsletter_repo.save(n)
             key = n.key()
             logging.info(u"Create newsletter {} - {}".format(n.number, n.title))
             for sublink in nl['links']:
                 link = Link.from_dict(sublink)
                 link.newsletter = key
-                link.save()
+                links_repo.save(link)
                 logging.info(u"Create link {}".format(link.title))
         for sublink in data['queue']:
             link = Link.from_json(sublink)
-            link.save()
+            links_repo.save(link)
         for sublink in data['drafts']:
             link = Link.from_json(sublink)
-            link.save()
+            links_repo.save(link)
         for sublink in data['readinglist']:
             link = Link.from_json(sublink)
-            link.save()
+            links_repo.save(link)
 
     logging.error("Starting up in local development mode")
     logging.root.level = logging.INFO
@@ -235,7 +239,7 @@ if __name__ == '__main__':
 
     @app.before_first_request
     def login_test_user():
-        user = User.create("testuser", "test@test.com", "Test User", "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80")
+        user = user_repo.create("testuser", "test@test.com", "Test User", "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80")
         login_user(user)
     # app.config['LOGIN_DISABLED'] = True
     import os

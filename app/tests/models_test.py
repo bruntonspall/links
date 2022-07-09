@@ -1,7 +1,9 @@
 import unittest
-
 from mockfirestore import MockFirestore
-from .models import Newsletter, Link, Database, Settings
+from models.newsletter import Newsletter
+from models.link import Link
+from models.database import Database
+from repositories import links_repo, newsletter_repo, settings_repo
 from datetime import datetime
 
 
@@ -22,7 +24,7 @@ class NewsletterTestCase(DatabaseTestCase):
         n.sent = True
         n.sentdate = datetime.fromisoformat("2020-03-07 13:00")
         n.slugify()
-        n.save()
+        newsletter_repo.save(n)
 
         n = Newsletter("Newsletter 2", "Some other text")
         n.number = 2
@@ -31,19 +33,19 @@ class NewsletterTestCase(DatabaseTestCase):
         n.sent = True
         n.sentdate = datetime.fromisoformat("2020-03-08 13:00")
         n.slugify()
-        n.save()
+        newsletter_repo.save(n)
 
         n = Newsletter("Newsletter 3", "Draft newsletter")
         n.number = 3
         n.stored = datetime.fromisoformat("2020-03-09 13:00")
         n.updated = datetime.fromisoformat("2020-03-09 13:00")
         n.slugify()
-        n.save()
+        newsletter_repo.save(n)
 
     def testNewsletter(self):
         actual = Newsletter('Kids in America', 'some text')
         actual.number = 777
-        actual.save()
+        newsletter_repo.save(actual)
 
         self.assertEqual("777", actual.key())
 
@@ -66,86 +68,86 @@ class NewsletterTestCase(DatabaseTestCase):
     def testQueries(self):
         self.createTestData()
 
-        self.assertEqual(3, len(list(Newsletter.list())))
-        newsletters = [Newsletter.from_dict(d.to_dict()) for d in Newsletter.list_published()]
+        self.assertEqual(3, len(list(newsletter_repo.list())))
+        newsletters = [Newsletter.from_dict(d.to_dict()) for d in newsletter_repo.list_published()]
         self.assertEqual(2, len(newsletters))
         self.assertEqual(2, newsletters[0].number)
         self.assertEqual(1, newsletters[1].number)
 
-        self.assertEqual(3, Newsletter.most_recent().number)
-        self.assertEqual(2, Newsletter.most_recent_published().number)
+        self.assertEqual(3, newsletter_repo.most_recent().number)
+        self.assertEqual(2, newsletter_repo.most_recent_published().number)
 
     def testGetByNumber(self):
         self.createTestData()
-        n = Newsletter.by_number(2)
+        n = newsletter_repo.by_number(2)
         self.assertEqual("Newsletter 2", n.title)
-        n = Newsletter.by_slug("newsletter-1")
+        n = newsletter_repo.by_slug("newsletter-1")
         self.assertEqual("Newsletter 1", n.title)
-        n = Newsletter.get("1")
+        n = newsletter_repo.get("1")
         self.assertEqual("Newsletter 1", n.title)
 
 
 class LinkTestCase(DatabaseTestCase):
     def testLink(self):
-        actual = Link(url="http://foo.com/something", type=Link.TOREAD)
+        actual = Link(url="http://foo.com/something", type=links_repo.TOREAD)
         id = actual.key
-        actual.save()
+        links_repo.save(actual)
         retval = Database.db.collection(Link.collection).document(id).get()
         self.assertTrue(retval.exists)
         actual = retval.to_dict()
         self.assertEqual(id, actual['key'])
         self.assertEqual("http://foo.com/something", actual['url'])
-        self.assertEqual(Link.TOREAD, actual['type'])
+        self.assertEqual(links_repo.TOREAD, actual['type'])
 
-        ret = Link.get(id)
+        ret = links_repo.get(id)
         self.assertEqual("http://foo.com/something", ret.url)
         self.assertEqual(id, ret.key)
 
     def testLinkLifecycle(self):
-        self.assertEqual(0, len(list(Link.toread())))
-        self.assertEqual(0, len(list(Link.drafts())))
-        self.assertEqual(0, len(list(Link.queued())))
+        self.assertEqual(0, len(list(links_repo.toread())))
+        self.assertEqual(0, len(list(links_repo.drafts())))
+        self.assertEqual(0, len(list(links_repo.queued())))
 
-        actual = Link(url="http://foo.com/thing", type=Link.TOREAD)
-        actual.save()
+        actual = Link(url="http://foo.com/thing", type=links_repo.TOREAD)
+        links_repo.save(actual)
 
-        self.assertEqual(1, len(list(Link.toread())))
-        self.assertEqual(0, len(list(Link.drafts())))
-        self.assertEqual(0, len(list(Link.queued())))
+        self.assertEqual(1, len(list(links_repo.toread())))
+        self.assertEqual(0, len(list(links_repo.drafts())))
+        self.assertEqual(0, len(list(links_repo.queued())))
 
-        actual.type = Link.DRAFT
-        actual.save()
+        actual.type = links_repo.DRAFT
+        links_repo.save(actual)
 
-        self.assertEqual(0, len(list(Link.toread())))
-        self.assertEqual(1, len(list(Link.drafts())))
-        self.assertEqual(0, len(list(Link.queued())))
+        self.assertEqual(0, len(list(links_repo.toread())))
+        self.assertEqual(1, len(list(links_repo.drafts())))
+        self.assertEqual(0, len(list(links_repo.queued())))
 
-        actual.type = Link.QUEUED
-        actual.save()
+        actual.type = links_repo.QUEUED
+        links_repo.save(actual)
 
-        self.assertEqual(0, len(list(Link.toread())))
-        self.assertEqual(0, len(list(Link.drafts())))
-        self.assertEqual(1, len(list(Link.queued())))
+        self.assertEqual(0, len(list(links_repo.toread())))
+        self.assertEqual(0, len(list(links_repo.drafts())))
+        self.assertEqual(1, len(list(links_repo.queued())))
 
-        Link.delete(actual.key)
+        links_repo.delete(actual.key)
 
-        self.assertEqual(0, len(list(Link.toread())))
-        self.assertEqual(0, len(list(Link.drafts())))
-        self.assertEqual(0, len(list(Link.queued())))
+        self.assertEqual(0, len(list(links_repo.toread())))
+        self.assertEqual(0, len(list(links_repo.drafts())))
+        self.assertEqual(0, len(list(links_repo.queued())))
 
     def createTestData(self):
-        Link(url="http://foo.com/toread1", type=Link.TOREAD).save()
-        Link(url="http://foo.com/toread2", type=Link.TOREAD).save()
-        Link(url="http://foo.com/draft1", type=Link.DRAFT).save()
-        Link(url="http://foo.com/queued1", type=Link.QUEUED).save()
-        Link(url="http://foo.com/deleted1", type=Link.DELETED).save()
+        links_repo.save(Link(url="http://foo.com/toread1", type=links_repo.TOREAD))
+        links_repo.save(Link(url="http://foo.com/toread2", type=links_repo.TOREAD))
+        links_repo.save(Link(url="http://foo.com/draft1", type=links_repo.DRAFT))
+        links_repo.save(Link(url="http://foo.com/queued1", type=links_repo.QUEUED))
+        links_repo.save(Link(url="http://foo.com/deleted1", type=links_repo.DELETED))
 
     def testQueries(self):
         self.createTestData()
-        self.assertEqual("http://foo.com/toread2", Link.toread()[0].url)
-        self.assertEqual("http://foo.com/toread1", Link.toread()[1].url)
-        self.assertEqual("http://foo.com/draft1", Link.drafts()[0].url)
-        self.assertEqual("http://foo.com/queued1", Link.queued()[0].url)
+        self.assertEqual("http://foo.com/toread2", links_repo.toread()[0].url)
+        self.assertEqual("http://foo.com/toread1", links_repo.toread()[1].url)
+        self.assertEqual("http://foo.com/draft1", links_repo.drafts()[0].url)
+        self.assertEqual("http://foo.com/queued1", links_repo.queued()[0].url)
 
     def testGetLinksNewsletter(self):
         n = Newsletter("Newsletter 1", "Some text")
@@ -155,30 +157,30 @@ class LinkTestCase(DatabaseTestCase):
         n.sent = True
         n.sentdate = datetime.fromisoformat("2020-03-07 13:00")
         n.slugify()
-        n.save()
-        link = Link(url="http://foo.com/toread1", type=Link.TOREAD, newsletter=n.key())
+        newsletter_repo.save(n)
+        link = Link(url="http://foo.com/toread1", type=links_repo.TOREAD, newsletter=n.key())
 
-        self.assertEqual(link.get_newsletter().to_dict(), n.to_dict())
+        self.assertEqual(newsletter_repo.get(link.newsletter).to_dict(), n.to_dict())
 
 
 class SettingTestCase(DatabaseTestCase):
     def testSetting(self):
-        Settings.set("k1", "v1")
-        retval = Database.db.collection(Settings.collection).document("k1").get()
+        settings_repo.set("k1", "v1")
+        retval = Database.db.collection(settings_repo.collection).document("k1").get()
         self.assertTrue(retval.exists)
         self.assertEqual({
             "name": "k1",
             "value": "v1"
         }, retval.to_dict())
 
-        self.assertEqual("v1", Settings.get("k1"))
+        self.assertEqual("v1", settings_repo.get("k1"))
 
     def testDefaultValue(self):
-        retval = Database.db.collection(Settings.collection).document("k1").get()
+        retval = Database.db.collection(settings_repo.collection).document("k1").get()
         self.assertFalse(retval.exists)
 
-        self.assertEqual("NOT SET", Settings.get("k1"))
-        retval = Database.db.collection(Settings.collection).document("k1").get()
+        self.assertEqual("NOT SET", settings_repo.get("k1"))
+        retval = Database.db.collection(settings_repo.collection).document("k1").get()
         self.assertTrue(retval.exists)
         self.assertEqual({
             "name": "k1",

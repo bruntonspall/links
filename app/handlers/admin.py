@@ -1,62 +1,44 @@
 # -*- coding: UTF-8 -*-
-from models import Newsletter, Link, Settings, Database
-from flask import Blueprint, redirect, request
-from flask_login import login_required
+from datetime import date, datetime
+from models.newsletter import Newsletter
+from models.link import Link
+from repositories import links_repo, newsletter_repo
+from flask import Blueprint, request
 import json
-import logging 
-from dateutil import parser
+import logging
 
 admin = Blueprint('admin', __name__)
-from datetime import date, datetime
+
 
 def json_serial(obj):
     """JSON serializer for objects not serializable by default json code"""
 
     if isinstance(obj, (datetime, date)):
         return obj.isoformat()
-    raise TypeError ("Type %s not serializable" % type(obj))
-
-@admin.route('/testdata')
-@login_required
-def testdata():
-    link = Link(url='http://www.iso27001security.com/html/27000.html',
-                type=Link.DRAFT,
-                title='ISMS/ISO27k overview section',
-                quote='I wish the committee would replace “information security risk” throughout ISO27k with the simpler and more appropriate term “information risk”.',
-                note='A note').save()
-    link = Link(url='https://www.riskiq.com/blog/labs/magecart-british-airways-breach/',
-                type=Link.DRAFT,
-                title='Inside the Magecart Breach of British Airways: How 22 Lines of Code Claimed 380,000 Victims',
-                quote='On September 6th, British Airways announced it had suffered a breach resulting in the theft of customer data. In interviews with the BBC, the company noted that around 380,000 customers could have been affected and that the stolen information included personal and payment information but not passport information. ',
-                note='A note').save()
-
-    newsletter = Newsletter(number='1', title="Test Newsleter 1", body="Body").save()
-    for link in Link.queued():
-        link.newsletter = newsletter.key()
-        link.save()
-    return redirect('/admin/index')
+    raise TypeError("Type %s not serializable" % type(obj))
 
 
 @admin.route('/export')
 def export():
     data = {
-        'newsletters':[],
-        'queue':[],
-        'readinglist':[],
-        'drafts':[]
+        'newsletters': [],
+        'queue': [],
+        'readinglist': [],
+        'drafts': []
     }
-    for newsletter in Newsletter.list():
+    for newsletter in newsletter_repo.list():
         news = newsletter.to_dict()
-        news['links'] = [link.to_dict() for link in Link.by_newsletter(newsletter.key)]
+        news['links'] = [link.to_dict() for link in links_repo.by_newsletter(newsletter.key)]
         data['newsletters'].append(news)
-    for link in Link.drafts():
+    for link in links_repo.drafts():
         data['drafts'].append(link.to_dict())
-    for link in Link.queued():
+    for link in links_repo.queued():
         data['queue'].append(link.to_dict())
-    for link in Link.toread():
+    for link in links_repo.toread():
         data['readinglist'].append(link.to_dict())
 
     return json.dumps(data, indent=4, default=json_serial)
+
 
 @admin.route('/import', methods=['POST'])
 def imp():
@@ -71,36 +53,19 @@ def imp():
         n = Newsletter.from_dict(nl)
         n.body = nl['intro']
         n.slugify()
-        n.save()
+        newsletter_repo.save(n)
         key = n.key()
         logging.info(u"Create newsletter {} - {}".format(n.number, n.title))
-        for l in nl['links']:
-            link = Link.from_dict(l)
+        for link_d in nl['links']:
+            link = Link.from_dict(link_d)
             link.newsletter = key
-            
-            link.save()
+            links_repo.save(link)
             logging.info(u"Create link {}".format(link.title))
-    for l in data['queue']:
-        link = Link.from_dict(l)
-        link.save()
-    for l in data['drafts']:
-        link = Link.from_dict(l)
-        link.save()
-    for l in data['readinglist']:
-        link = Link.from_dict(l)
-        link.save()
+    for link in data['queue']:
+        links_repo.save(Link.from_dict(link))
+    for link in data['drafts']:
+        links_repo.save(Link.from_dict(link))
+    for link in data['readinglist']:
+        links_repo.sve(Link.from_dict(link))
 
-    return "OK"
-
-
-@admin.route('/migrate', methods=['POST'])
-def migrate():
-    for newsletter in Database.db.collection(Newsletter.collection).stream():
-        d = newsletter.to_dict()
-        if isinstance(d['stored'], str):
-            stored = datetime.fromisoformat(d['stored'])
-            Database.db.collection(Newsletter.collection).document(newsletter.id).update({'stored': stored})
-        if isinstance(d['sentdate'], str):
-            stored = datetime.fromisoformat(d['sentdate'])
-            Database.db.collection(Newsletter.collection).document(newsletter.id).update({'sentdate': stored})
     return "OK"
