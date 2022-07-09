@@ -1,10 +1,8 @@
-from flask import request, render_template, redirect, url_for, Blueprint, abort
+from flask import request, render_template, redirect, Blueprint
 from services import newsletter_service
 from models.newsletter import Newsletter
-from models.link import Link
-from datetime import date, datetime
+from repositories import links_repo
 from flask_login import login_required
-import logging
 
 
 newsletter = Blueprint('newsletter', __name__)
@@ -21,7 +19,7 @@ def create_newsletter():
 @login_required
 def get_newsletter(newsletterid):
     newsletter = Newsletter.get(newsletterid)
-    return render_template("newsletter.html", newsletter=newsletter, links=Link.by_newsletter(newsletter.key()))
+    return render_template("newsletter.html", newsletter=newsletter, links=links_repo.by_newsletter(newsletter.key()))
 
 
 @newsletter.route('/<newsletterid>/send', methods=['POST'])

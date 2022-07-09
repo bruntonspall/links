@@ -2,7 +2,6 @@ from datetime import datetime, timezone
 import uuid
 from .newsletter import Newsletter
 from .database import Database
-from google.cloud import firestore
 
 
 class Link:
@@ -71,59 +70,9 @@ class Link:
         link.newsletter = source.get('newsletter', None)
         return link
 
-    @staticmethod
-    def first(query):
-        docs = query.limit(1).stream()
-        doc = next(docs, None)
-        if doc:
-            return Link.from_dict(doc.to_dict())
-        return None
-
     def save(self):
         self.updated = datetime.now(timezone.utc)
         Database.getDb().collection(Link.collection).document(self.key).set(self.to_dict())
-
-    @staticmethod
-    def query():
-        return Database.getDb().collection(Link.collection)
-
-    @staticmethod
-    def get_by_url(url):
-        return Link.first(Link.query().where("url", "==", url))
-
-    @staticmethod
-    def get(key):
-        return Link.from_dict(Link.query().document(key).get().to_dict())
-
-    @staticmethod
-    def delete(key):
-        Link.query().document(key).update({
-            "type": Link.DELETED
-        })
-
-    @staticmethod
-    def toread():
-        return [Link.from_dict(d.to_dict()) for d in Link.query().where("type", "==", Link.TOREAD).order_by("updated", firestore.Query.DESCENDING).stream()]
-
-    @staticmethod
-    def drafts():
-        return [Link.from_dict(d.to_dict()) for d in Link.query().where("type", "==", Link.DRAFT).order_by("updated", firestore.Query.DESCENDING).stream()]
-
-    @staticmethod
-    def queued():
-        return [Link.from_dict(d.to_dict()) for d in Link.query().where("type", "==", Link.QUEUED).order_by("updated", firestore.Query.DESCENDING).stream()]
-
-    @staticmethod
-    def queued_in_reverse():
-        return [Link.from_dict(d.to_dict()) for d in Link.query().where("type", "==", Link.QUEUED).order_by("updated").stream()]
-
-    @staticmethod
-    def by_newsletter(newsletter):
-        return [Link.from_dict(d.to_dict()) for d in Link.query().where("newsletter", "==", newsletter).order_by("updated", firestore.Query.DESCENDING).stream()]
-
-    @staticmethod
-    def by_newsletter_in_reverse(newsletter):
-        return [Link.from_dict(d.to_dict()) for d in Link.query().where("newsletter", "==", newsletter).order_by("updated").stream()]
 
     def get_newsletter(self):
         return Newsletter.get(self.newsletter)

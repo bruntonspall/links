@@ -2,6 +2,8 @@
 from models.newsletter import Newsletter
 from models.link import Link
 from models.database import Database
+from services import links_service, newsletter_service
+from repositories import links_repo
 from flask import Blueprint, redirect, request
 from flask_login import login_required
 import json
@@ -11,45 +13,26 @@ from dateutil import parser
 admin = Blueprint('admin', __name__)
 from datetime import date, datetime
 
+
 def json_serial(obj):
     """JSON serializer for objects not serializable by default json code"""
 
     if isinstance(obj, (datetime, date)):
         return obj.isoformat()
-    raise TypeError ("Type %s not serializable" % type(obj))
-
-@admin.route('/testdata')
-@login_required
-def testdata():
-    link = Link(url='http://www.iso27001security.com/html/27000.html',
-                type=Link.DRAFT,
-                title='ISMS/ISO27k overview section',
-                quote='I wish the committee would replace “information security risk” throughout ISO27k with the simpler and more appropriate term “information risk”.',
-                note='A note').save()
-    link = Link(url='https://www.riskiq.com/blog/labs/magecart-british-airways-breach/',
-                type=Link.DRAFT,
-                title='Inside the Magecart Breach of British Airways: How 22 Lines of Code Claimed 380,000 Victims',
-                quote='On September 6th, British Airways announced it had suffered a breach resulting in the theft of customer data. In interviews with the BBC, the company noted that around 380,000 customers could have been affected and that the stolen information included personal and payment information but not passport information. ',
-                note='A note').save()
-
-    newsletter = Newsletter(number='1', title="Test Newsleter 1", body="Body").save()
-    for link in Link.queued():
-        link.newsletter = newsletter.key()
-        link.save()
-    return redirect('/admin/index')
+    raise TypeError("Type %s not serializable" % type(obj))
 
 
 @admin.route('/export')
 def export():
     data = {
-        'newsletters':[],
-        'queue':[],
-        'readinglist':[],
-        'drafts':[]
+        'newsletters': [],
+        'queue': [],
+        'readinglist': [],
+        'drafts': []
     }
     for newsletter in Newsletter.list():
         news = newsletter.to_dict()
-        news['links'] = [link.to_dict() for link in Link.by_newsletter(newsletter.key)]
+        news['links'] = [link.to_dict() for link in links_repo.by_newsletter(newsletter.key)]
         data['newsletters'].append(news)
     for link in Link.drafts():
         data['drafts'].append(link.to_dict())

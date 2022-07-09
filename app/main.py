@@ -13,6 +13,9 @@ from models.user import User
 from flask import render_template, request, url_for, redirect
 from flaskext.markdown import Markdown
 
+from repositories import links_repo
+from services import links_service, newsletter_service
+
 from handlers.admin import admin
 from handlers.newsletter import newsletter
 from handlers.links import links
@@ -64,7 +67,7 @@ def load_user(user_id):
 @app.route('/admin/index')
 @login_required
 def adminindex():
-    return render_template("adminlist.html", newsletters=Newsletter.list(), queue=Link.queued(), links=Link.drafts())
+    return render_template("adminlist.html", newsletters=Newsletter.list(), queue=links_repo.queued(), links=links_repo.drafts())
 
 
 def get_google_provider_cfg():
@@ -165,7 +168,7 @@ def logout():
 @app.route('/admin/readinglist')
 @login_required
 def reading():
-    return render_template("readinglist.html", newsletters=Newsletter.list(), readinglist=Link.toread())
+    return render_template("readinglist.html", newsletters=Newsletter.list(), readinglist=links_repo.toread())
 
 
 @app.route('/')
@@ -188,7 +191,7 @@ def archive():
 def newsletter(newsletterslug):
     nl = Newsletter.by_slug(newsletterslug)
     if nl:
-        return render_template("front/newsletter.html", newsletter=nl, links=Link.by_newsletter(nl.key()), newsletters=Newsletter.list_published())
+        return render_template("front/newsletter.html", newsletter=nl, links=links_repo.by_newsletter(nl.key()), newsletters=Newsletter.list_published())
     else:
         return 'No such newsletter', 404
 

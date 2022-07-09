@@ -5,6 +5,7 @@ from models.newsletter import Newsletter
 from models.link import Link
 from services import newsletter_service
 from mockfirestore import MockFirestore
+from repositories import links_repo
 
 
 class DatabaseTestCase(unittest.TestCase):
@@ -60,7 +61,7 @@ class NewsletterServiceTestCase(DatabaseTestCase):
         nl = newsletter_service.create_newsletter()
         self.assertEqual(len(Newsletter.list()), 3)
         self.assertEqual(nl.number, '3')
-        links = Link.by_newsletter(nl.key())
+        links = links_repo.by_newsletter(nl.key())
 
         self.assertEqual(len(links), 1)
         self.assertEqual(links[0].url, self.queuedlink.url)

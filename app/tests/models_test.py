@@ -4,6 +4,7 @@ from models.newsletter import Newsletter
 from models.link import Link
 from models.database import Database
 from models.settings import Settings
+from repositories import links_repo
 from datetime import datetime
 
 
@@ -99,41 +100,41 @@ class LinkTestCase(DatabaseTestCase):
         self.assertEqual("http://foo.com/something", actual['url'])
         self.assertEqual(Link.TOREAD, actual['type'])
 
-        ret = Link.get(id)
+        ret = links_repo.get(id)
         self.assertEqual("http://foo.com/something", ret.url)
         self.assertEqual(id, ret.key)
 
     def testLinkLifecycle(self):
-        self.assertEqual(0, len(list(Link.toread())))
-        self.assertEqual(0, len(list(Link.drafts())))
-        self.assertEqual(0, len(list(Link.queued())))
+        self.assertEqual(0, len(list(links_repo.toread())))
+        self.assertEqual(0, len(list(links_repo.drafts())))
+        self.assertEqual(0, len(list(links_repo.queued())))
 
         actual = Link(url="http://foo.com/thing", type=Link.TOREAD)
         actual.save()
 
-        self.assertEqual(1, len(list(Link.toread())))
-        self.assertEqual(0, len(list(Link.drafts())))
-        self.assertEqual(0, len(list(Link.queued())))
+        self.assertEqual(1, len(list(links_repo.toread())))
+        self.assertEqual(0, len(list(links_repo.drafts())))
+        self.assertEqual(0, len(list(links_repo.queued())))
 
         actual.type = Link.DRAFT
         actual.save()
 
-        self.assertEqual(0, len(list(Link.toread())))
-        self.assertEqual(1, len(list(Link.drafts())))
-        self.assertEqual(0, len(list(Link.queued())))
+        self.assertEqual(0, len(list(links_repo.toread())))
+        self.assertEqual(1, len(list(links_repo.drafts())))
+        self.assertEqual(0, len(list(links_repo.queued())))
 
         actual.type = Link.QUEUED
         actual.save()
 
-        self.assertEqual(0, len(list(Link.toread())))
-        self.assertEqual(0, len(list(Link.drafts())))
-        self.assertEqual(1, len(list(Link.queued())))
+        self.assertEqual(0, len(list(links_repo.toread())))
+        self.assertEqual(0, len(list(links_repo.drafts())))
+        self.assertEqual(1, len(list(links_repo.queued())))
 
-        Link.delete(actual.key)
+        links_repo.delete(actual.key)
 
-        self.assertEqual(0, len(list(Link.toread())))
-        self.assertEqual(0, len(list(Link.drafts())))
-        self.assertEqual(0, len(list(Link.queued())))
+        self.assertEqual(0, len(list(links_repo.toread())))
+        self.assertEqual(0, len(list(links_repo.drafts())))
+        self.assertEqual(0, len(list(links_repo.queued())))
 
     def createTestData(self):
         Link(url="http://foo.com/toread1", type=Link.TOREAD).save()
@@ -144,10 +145,10 @@ class LinkTestCase(DatabaseTestCase):
 
     def testQueries(self):
         self.createTestData()
-        self.assertEqual("http://foo.com/toread2", Link.toread()[0].url)
-        self.assertEqual("http://foo.com/toread1", Link.toread()[1].url)
-        self.assertEqual("http://foo.com/draft1", Link.drafts()[0].url)
-        self.assertEqual("http://foo.com/queued1", Link.queued()[0].url)
+        self.assertEqual("http://foo.com/toread2", links_repo.toread()[0].url)
+        self.assertEqual("http://foo.com/toread1", links_repo.toread()[1].url)
+        self.assertEqual("http://foo.com/draft1", links_repo.drafts()[0].url)
+        self.assertEqual("http://foo.com/queued1", links_repo.queued()[0].url)
 
     def testGetLinksNewsletter(self):
         n = Newsletter("Newsletter 1", "Some text")
