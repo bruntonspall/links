@@ -1,34 +1,34 @@
 from datetime import datetime
-from repositories import links_repo
+from repositories import links_repo, newsletter_repo
 from models.newsletter import Newsletter
 
 
 def create_newsletter(number=None):
     if not number:
-        number = str(int(Newsletter.most_recent().number) + 1)
+        number = str(int(newsletter_repo.most_recent().number) + 1)
     newsletter = Newsletter(number=number)
-    newsletter.save()
+    newsletter_repo.save(newsletter)
     for link in links_repo.queued_in_reverse():
         link.newsletter = newsletter.key()
-        link.save()
+        links_repo.save(link)
     return newsletter
 
 
 def send(newsletterid, url=None):
-    newsletter = Newsletter.get(newsletterid)
+    newsletter = newsletter_repo.get(newsletterid)
     newsletter.url = url
     newsletter.sent = True
     newsletter.sentdate = datetime.now()
-    newsletter.save()
+    newsletter_repo.save(newsletter)
     for link in links_repo.by_newsletter_in_reverse(newsletter.key()):
         link.type = links_repo.SENT
-        link.save()
+        links_repo.save(link)
     return newsletter
 
 
 def delete(newsletterid):
-    newsletter = Newsletter.get(newsletterid)
-    newsletter.delete()
+    newsletter = newsletter_repo.get(newsletterid)
+    newsletter_repo.delete(newsletter)
     for link in links_repo.by_newsletter_in_reverse(newsletter.key()):
         link.type = links_repo.QUEUED
-        link.save()
+        links_repo.save(link)

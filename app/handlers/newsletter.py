@@ -1,7 +1,7 @@
 from flask import request, render_template, redirect, Blueprint
 from services import newsletter_service
 from models.newsletter import Newsletter
-from repositories import links_repo
+from repositories import links_repo, newsletter_repo
 from flask_login import login_required
 
 
@@ -18,7 +18,7 @@ def create_newsletter():
 @newsletter.route('/<newsletterid>', methods=['GET'])
 @login_required
 def get_newsletter(newsletterid):
-    newsletter = Newsletter.get(newsletterid)
+    newsletter = newsletter_repo.get(newsletterid)
     return render_template("newsletter.html", newsletter=newsletter, links=links_repo.by_newsletter(newsletter.key()))
 
 
@@ -41,12 +41,12 @@ def delete_newsletter(newsletterid):
 @newsletter.route('/<newsletterid>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_newsletter(newsletterid):
-    newsletter = Newsletter.get(newsletterid)
+    newsletter = newsletter_repo.get(newsletterid)
     if request.method == 'POST':
         newsletter.title = request.values.get('title')
         newsletter.body = request.values.get('body')
         newsletter.number = request.values.get('number')
         newsletter.slugify()
-        newsletter.save()
+        newsletter_repo.save(newsletter)
         return redirect('/admin/newsletter/{}'.format(newsletterid))
     return render_template('edit_newsletter.html', newsletter=newsletter)

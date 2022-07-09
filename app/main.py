@@ -13,7 +13,7 @@ from models.user import User
 from flask import render_template, request, url_for, redirect
 from flaskext.markdown import Markdown
 
-from repositories import links_repo
+from repositories import links_repo, newsletter_repo
 from services import links_service, newsletter_service
 
 from handlers.admin import admin
@@ -67,7 +67,7 @@ def load_user(user_id):
 @app.route('/admin/index')
 @login_required
 def adminindex():
-    return render_template("adminlist.html", newsletters=Newsletter.list(), queue=links_repo.queued(), links=links_repo.drafts())
+    return render_template("adminlist.html", newsletters=newsletter_repo.list(), queue=links_repo.queued(), links=links_repo.drafts())
 
 
 def get_google_provider_cfg():
@@ -168,12 +168,12 @@ def logout():
 @app.route('/admin/readinglist')
 @login_required
 def reading():
-    return render_template("readinglist.html", newsletters=Newsletter.list(), readinglist=links_repo.toread())
+    return render_template("readinglist.html", newsletters=newsletter_repo.list(), readinglist=links_repo.toread())
 
 
 @app.route('/')
 def index():
-    nl = Newsletter.most_recent_published()
+    nl = newsletter_repo.most_recent_published()
     if not nl:
         nl = Newsletter(title="DEBUG NEWSLETTER", body="DEBUG DEBUG, DEBUG", number=-1)
     return render_template("front/index.html", newsletter=nl)
@@ -181,17 +181,17 @@ def index():
 
 @app.route('/archive')
 def archive():
-    nl = Newsletter.most_recent_published()
+    nl = newsletter_repo.most_recent_published()
     if not nl:
         nl = Newsletter(title="DEBUG NEWSLETTER", body="DEBUG DEBUG, DEBUG", number=-1)
-    return render_template("front/archive.html", newsletter=nl, newsletters=Newsletter.list_published())
+    return render_template("front/archive.html", newsletter=nl, newsletters=newsletter_repo.list_published())
 
 
 @app.route('/<newsletterslug>')
 def newsletter(newsletterslug):
-    nl = Newsletter.by_slug(newsletterslug)
+    nl = newsletter_repo.by_slug(newsletterslug)
     if nl:
-        return render_template("front/newsletter.html", newsletter=nl, links=links_repo.by_newsletter(nl.key()), newsletters=Newsletter.list_published())
+        return render_template("front/newsletter.html", newsletter=nl, links=links_repo.by_newsletter(nl.key()), newsletters=newsletter_repo.list_published())
     else:
         return 'No such newsletter', 404
 
@@ -217,23 +217,23 @@ if __name__ == '__main__':
             n = Newsletter.from_dict(nl)
             n.body = nl['intro']
             n.slugify()
-            n.save()
+            newsletter_repo.save(n)
             key = n.key()
             logging.info(u"Create newsletter {} - {}".format(n.number, n.title))
             for sublink in nl['links']:
                 link = Link.from_dict(sublink)
                 link.newsletter = key
-                link.save()
+                links_repo.save(link)
                 logging.info(u"Create link {}".format(link.title))
         for sublink in data['queue']:
             link = Link.from_json(sublink)
-            link.save()
+            links_repo.save(link)
         for sublink in data['drafts']:
             link = Link.from_json(sublink)
-            link.save()
+            links_repo.save(link)
         for sublink in data['readinglist']:
             link = Link.from_json(sublink)
-            link.save()
+            links_repo.save(link)
 
     logging.error("Starting up in local development mode")
     logging.root.level = logging.INFO

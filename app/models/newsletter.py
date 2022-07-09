@@ -1,6 +1,4 @@
-from .database import Database
 from datetime import datetime
-from google.cloud import firestore
 from slugify import slugify
 
 
@@ -48,62 +46,8 @@ class Newsletter:
             d['sentdate'] = self.sentdate
         return d
 
-    def save(self):
-        self.updated = datetime.now()
-        Database.getDb().collection(Newsletter.collection).document(self.key()).set(self.to_dict())
-
     def key(self):
         return str(self.number)
-
-    def delete(self):
-        # for link in Link.by_newsletter(self.key()):
-        #     link.newsletter = None
-        #     link.save()
-        Database.getDb().collection(Newsletter.collection).document(self.key()).delete()
-
-    @staticmethod
-    def first(query):
-        docs = query.limit(1).stream()
-        doc = next(docs, None)
-        if doc:
-            return Newsletter.from_dict(doc.to_dict())
-        return None
-
-    @staticmethod
-    def _list():
-        return Database.getDb().collection(Newsletter.collection).order_by(u"updated", direction=firestore.Query.DESCENDING)
-
-    @staticmethod
-    def list():
-        return [Newsletter.from_dict(d.to_dict()) for d in Newsletter._list().stream()]
-
-    @staticmethod
-    def _list_published():
-        return Database.getDb().collection(Newsletter.collection).where(u"sent", "==", True).order_by(u"sentdate", direction=firestore.Query.DESCENDING)
-
-    @staticmethod
-    def list_published():
-        return [Newsletter.from_dict(d.to_dict()) for d in Newsletter._list_published().stream()]
-
-    @staticmethod
-    def most_recent():
-        return Newsletter.first(Newsletter._list())
-
-    @staticmethod
-    def most_recent_published():
-        return Newsletter.first(Newsletter._list_published())
-
-    @staticmethod
-    def by_number(number):
-        return Newsletter.first(Database.getDb().collection(Newsletter.collection).where(u"number", "==", number))
-
-    @staticmethod
-    def by_slug(slug):
-        return Newsletter.first(Database.getDb().collection(Newsletter.collection).where(u"slug", "==", slug))
-
-    @staticmethod
-    def get(key):
-        return Newsletter.from_dict(Database.getDb().collection(Newsletter.collection).document(key).get().to_dict())
 
     def slugify(self):
         if not self.title:

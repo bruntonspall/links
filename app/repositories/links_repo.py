@@ -1,12 +1,14 @@
 from models.link import Link
 from models.database import Database
 from google.cloud import firestore
+from datetime import datetime, timezone
 
-TOREAD = Link.TOREAD
-DRAFT = Link.DRAFT
-QUEUED = Link.QUEUED
-SENT = Link.SENT
-DELETED = Link.DELETED
+
+TOREAD = 0
+DRAFT = 1
+QUEUED = 2
+SENT = 3
+DELETED = 4
 
 
 def first(query):
@@ -18,7 +20,7 @@ def first(query):
 
 
 def create(link):
-    link.save()
+    save(link)
 
 
 def query():
@@ -40,19 +42,19 @@ def delete(key):
 
 
 def toread():
-    return [Link.from_dict(d.to_dict()) for d in query().where("type", "==", Link.TOREAD).order_by("updated", firestore.Query.DESCENDING).stream()]
+    return [Link.from_dict(d.to_dict()) for d in query().where("type", "==", TOREAD).order_by("updated", firestore.Query.DESCENDING).stream()]
 
 
 def drafts():
-    return [Link.from_dict(d.to_dict()) for d in query().where("type", "==", Link.DRAFT).order_by("updated", firestore.Query.DESCENDING).stream()]
+    return [Link.from_dict(d.to_dict()) for d in query().where("type", "==", DRAFT).order_by("updated", firestore.Query.DESCENDING).stream()]
 
 
 def queued():
-    return [Link.from_dict(d.to_dict()) for d in query().where("type", "==", Link.QUEUED).order_by("updated", firestore.Query.DESCENDING).stream()]
+    return [Link.from_dict(d.to_dict()) for d in query().where("type", "==", QUEUED).order_by("updated", firestore.Query.DESCENDING).stream()]
 
 
 def queued_in_reverse():
-    return [Link.from_dict(d.to_dict()) for d in query().where("type", "==", Link.QUEUED).order_by("updated").stream()]
+    return [Link.from_dict(d.to_dict()) for d in query().where("type", "==", QUEUED).order_by("updated").stream()]
 
 
 def by_newsletter(newsletter):
@@ -61,3 +63,8 @@ def by_newsletter(newsletter):
 
 def by_newsletter_in_reverse(newsletter):
     return [Link.from_dict(d.to_dict()) for d in query().where("newsletter", "==", newsletter).order_by("updated").stream()]
+
+
+def save(link):
+    link.updated = datetime.now(timezone.utc)
+    Database.getDb().collection(Link.collection).document(link.key).set(link.to_dict())

@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 from flask import request, render_template, redirect, Blueprint
 from services import links_service
+from repositories import links_repo
 from models.link import Link
 from flask_login import login_required
 import logging
@@ -28,9 +29,9 @@ def edit_link(linkid):
         link.type = int(request.form.get('linktype', link.type))
         todraft = request.form.get('todraft', None)
         if todraft:
-            link.type = Link.DRAFT
+            link.type = links_repo.DRAFT
 
-        link.save()
+        links_repo.save(link)
         return redirect('/admin/index')
     return render_template("form.html", link=link)
 
@@ -76,7 +77,7 @@ def add_get():
     url = request.values.get('url')
     link = links_service.get_by_url(url)
     if not link:
-        link = Link(url=url, type=Link.TOREAD)
+        link = Link(url=url, type=links_repo.TOREAD)
     link.title = request.args.get('title', link.title)
     link.quote = request.args.get('quote', link.quote)
     link.note = request.args.get('note', link.note)
@@ -89,13 +90,13 @@ def add_post():
     url = request.form.get('url')
     link = links_service.get_by_url(url)
     if not link:
-        link = Link(url=url, type=Link.TOREAD)
+        link = Link(url=url, type=links_repo.TOREAD)
     link.title = request.form.get('title', link.title)
     link.quote = request.form.get('quote', link.quote)
     link.note = request.form.get('note', link.note)
     link.type = int(request.form.get('linktype', link.type))
     todraft = request.form.get('todraft', None)
     if todraft:
-        link.type = Link.DRAFT
+        link.type = links_repo.DRAFT
     links_service.create(link)
     return render_template('form.html', link=link)

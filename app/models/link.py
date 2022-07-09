@@ -1,15 +1,8 @@
 from datetime import datetime, timezone
 import uuid
-from .newsletter import Newsletter
-from .database import Database
 
 
 class Link:
-    TOREAD = 0
-    DRAFT = 1
-    QUEUED = 2
-    SENT = 3
-    DELETED = 4
 
     # stored = ndb.DateTimeProperty(auto_now_add=True)
     # updated = ndb.DateTimeProperty(auto_now=True)
@@ -69,10 +62,3 @@ class Link:
         link.updated = datetime.fromisoformat(source['updated']).replace(tzinfo=timezone.utc)
         link.newsletter = source.get('newsletter', None)
         return link
-
-    def save(self):
-        self.updated = datetime.now(timezone.utc)
-        Database.getDb().collection(Link.collection).document(self.key).set(self.to_dict())
-
-    def get_newsletter(self):
-        return Newsletter.get(self.newsletter)
