@@ -40,7 +40,7 @@ RUN pytest
 FROM python:3.10-slim
 ENV APP_HOME /app
 WORKDIR $APP_HOME
-COPY app ./
+COPY --from=build /app ./
 COPY --from=assets /app/static/css/main.css /app/static/css/main.css
 COPY requirements.txt .
 RUN pip install -r requirements.txt

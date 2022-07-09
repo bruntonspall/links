@@ -7,6 +7,7 @@ import twitter
 import flask.json
 import datetime
 import logging
+from app.fetchutils import notion_richtext_to_markdown
 from notion_client import Client
 import google.cloud.logging
 
@@ -91,45 +92,6 @@ def fetch_pinboard():
                 count += 1
     logging.info(f"Processed {count} items")
     return redirect("/admin/fetch/")
-
-
-def notion_richtext_to_markdown(block):
-    md = ""
-    prev_text = False
-    for subblock in block:
-        prefix = ""
-        suffix = ""
-        text = subblock["text"]["content"]
-        if subblock["annotations"]["bold"]:
-            prefix += "**"
-            suffix += "**"
-            
-        if subblock["annotations"]["italic"]:
-            prefix += "_"
-            suffix += "_"
-        if subblock["annotations"]["code"]:
-            prefix += "`"
-            suffix += "`"
-        if subblock["annotations"]["strikethrough"]:
-            prefix += "~~"
-            suffix += "~~"
-        if "link" in subblock:
-            prefix += "["
-            suffix += "]("+subblock["link"]["url"]+")"
-        if prefix == "" and suffix == "":
-            # There's no annotations, so this is just content.
-            # If the previous one was just content, then it's a new paragraph, so end it with a new paragraph
-            if prev_text:
-                suffix = "\n\n"
-            else:
-                # This is just content so set prev_text
-                prev_text = True
-        else:
-            # This is't just content, so unset prev_text
-            prev_text = False
-        md += f"{prefix}{text.strip()}{suffix} "
-    logger.log_struct({"entry": "convert", "input": block, "markdown": md})
-    return md
 
 
 @fetch.route('/notion')
