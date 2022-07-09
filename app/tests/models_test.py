@@ -3,8 +3,7 @@ from mockfirestore import MockFirestore
 from models.newsletter import Newsletter
 from models.link import Link
 from models.database import Database
-from models.settings import Settings
-from repositories import links_repo, newsletter_repo
+from repositories import links_repo, newsletter_repo, settings_repo
 from datetime import datetime
 
 
@@ -166,22 +165,22 @@ class LinkTestCase(DatabaseTestCase):
 
 class SettingTestCase(DatabaseTestCase):
     def testSetting(self):
-        Settings.set("k1", "v1")
-        retval = Database.db.collection(Settings.collection).document("k1").get()
+        settings_repo.set("k1", "v1")
+        retval = Database.db.collection(settings_repo.collection).document("k1").get()
         self.assertTrue(retval.exists)
         self.assertEqual({
             "name": "k1",
             "value": "v1"
         }, retval.to_dict())
 
-        self.assertEqual("v1", Settings.get("k1"))
+        self.assertEqual("v1", settings_repo.get("k1"))
 
     def testDefaultValue(self):
-        retval = Database.db.collection(Settings.collection).document("k1").get()
+        retval = Database.db.collection(settings_repo.collection).document("k1").get()
         self.assertFalse(retval.exists)
 
-        self.assertEqual("NOT SET", Settings.get("k1"))
-        retval = Database.db.collection(Settings.collection).document("k1").get()
+        self.assertEqual("NOT SET", settings_repo.get("k1"))
+        retval = Database.db.collection(settings_repo.collection).document("k1").get()
         self.assertTrue(retval.exists)
         self.assertEqual({
             "name": "k1",

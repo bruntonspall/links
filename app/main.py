@@ -9,7 +9,6 @@ from models.newsletter import Newsletter
 from models.link import Link
 from models.database import Database
 from models.user import User
-# from models.settings import Settings
 from flask import render_template, request, url_for, redirect
 from flaskext.markdown import Markdown
 
