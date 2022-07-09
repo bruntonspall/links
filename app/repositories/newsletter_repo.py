@@ -48,8 +48,9 @@ def get(key):
     return Newsletter.from_dict(Database.getDb().collection(Newsletter.collection).document(key).get().to_dict())
 
 
-def save(newletter):
-    newletter.updated = datetime.now()
+def save(newletter, update_time=True):
+    if update_time:
+        newletter.updated = datetime.now()
     Database.getDb().collection(Newsletter.collection).document(newletter.key()).set(newletter.to_dict())
 
 

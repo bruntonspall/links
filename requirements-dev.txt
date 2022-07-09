@@ -8,3 +8,4 @@ nose
 nose-exclude
 mock-firestore
 pyOpenSSL
+bs4

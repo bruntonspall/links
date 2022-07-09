@@ -200,38 +200,39 @@ def server_error(e):
     return 'An internal error occurred.', 500
 
 
-if __name__ == '__main__':
-    def import_from_file(fname):
-        import json
-        data = json.load(open(fname))
-        for nl in data['newsletters']:
-            logging.info(u"Parsing {}".format(nl))
-            # Change up the sent fields
-            if nl['sent']:
-                nl['sentdate'] = nl['sent']
-                nl['sent'] = True
+def import_from_file(fname):
+    import json
+    data = json.load(open(fname))
+    for nl in data['newsletters']:
+        logging.info(u"Parsing {}".format(nl))
+        # Change up the sent fields
+        if nl['sent']:
+            nl['sentdate'] = nl['sent']
+            nl['sent'] = True
 
-            n = Newsletter.from_dict(nl)
-            n.body = nl['intro']
-            n.slugify()
-            newsletter_repo.save(n)
-            key = n.key()
-            logging.info(u"Create newsletter {} - {}".format(n.number, n.title))
-            for sublink in nl['links']:
-                link = Link.from_dict(sublink)
-                link.newsletter = key
-                links_repo.save(link)
-                logging.info(u"Create link {}".format(link.title))
-        for sublink in data['queue']:
-            link = Link.from_json(sublink)
+        n = Newsletter.from_dict(nl)
+        n.body = nl['intro']
+        n.slugify()
+        newsletter_repo.save(n)
+        key = n.key()
+        logging.info(u"Create newsletter {} - {}".format(n.number, n.title))
+        for sublink in nl['links']:
+            link = Link.from_dict(sublink)
+            link.newsletter = key
             links_repo.save(link)
-        for sublink in data['drafts']:
-            link = Link.from_json(sublink)
-            links_repo.save(link)
-        for sublink in data['readinglist']:
-            link = Link.from_json(sublink)
-            links_repo.save(link)
+            logging.info(u"Create link {}".format(link.title))
+    for sublink in data['queue']:
+        link = Link.from_json(sublink)
+        links_repo.save(link)
+    for sublink in data['drafts']:
+        link = Link.from_json(sublink)
+        links_repo.save(link)
+    for sublink in data['readinglist']:
+        link = Link.from_json(sublink)
+        links_repo.save(link)
 
+
+def debug():
     logging.error("Starting up in local development mode")
     logging.root.level = logging.INFO
     from mockfirestore import MockFirestore
@@ -245,4 +246,8 @@ if __name__ == '__main__':
     import os
     if os.path.exists("export.json"):
         import_from_file("export.json")
+
+
+if __name__ == '__main__':
+    debug()
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
