@@ -1,5 +1,7 @@
-from flask import request, render_template, redirect, url_for, Blueprint
-from models import Newsletter, Link, Settings
+from flask import request, render_template, redirect, url_for, Blueprint, abort
+from services import newsletter_service
+from models.newsletter import Newsletter
+from models.link import Link
 from datetime import date, datetime
 from flask_login import login_required
 import logging
@@ -11,19 +13,8 @@ newsletter = Blueprint('newsletter', __name__)
 @newsletter.route('/create', methods=['POST'])
 @login_required
 def create_newsletter():
-    if request.values.get('number'):
-        number = request.values.get('number')
-    else:
-        old = Newsletter.most_recent()
-        number = 1
-        if old:
-            number = str(int(old.number)+1)
-    newsletter = Newsletter(number=number)
-    newsletter.save()
-    for link in Link.queued_in_reverse():
-        link.newsletter = newsletter.key()
-        link.save()
-    return redirect('/admin/newsletter/{}'.format(newsletter.key()))
+    nl = newsletter_service.create_newsletter(number=request.values.get('number'))
+    return redirect('/admin/newsletter/{}'.format(nl.key()))
 
 
 @newsletter.route('/<newsletterid>', methods=['GET'])
@@ -36,14 +27,8 @@ def get_newsletter(newsletterid):
 @newsletter.route('/<newsletterid>/send', methods=['POST'])
 @login_required
 def send_newsletter(newsletterid):
-    newsletter = Newsletter.get(newsletterid)
-    newsletter.url = request.values.get('url')
-    newsletter.sent = True
-    newsletter.sentdate = datetime.now()
-    newsletter.save()
-    for link in Link.by_newsletter_in_reverse(newsletter.key()):
-        link.type = Link.SENT
-        link.save()
+    url = request.values.get('url')
+    newsletter_service.send(newsletterid, url)
 
     return redirect('/admin/newsletter/{}'.format(newsletterid))
 
@@ -51,8 +36,7 @@ def send_newsletter(newsletterid):
 @newsletter.route('/<newsletterid>/delete', methods=['POST'])
 @login_required
 def delete_newsletter(newsletterid):
-    newsletter = Newsletter.get(newsletterid)
-    newsletter.delete()
+    newsletter_service.delete(newsletterid)
     return redirect('/admin/index')
 
 
@@ -62,16 +46,9 @@ def edit_newsletter(newsletterid):
     newsletter = Newsletter.get(newsletterid)
     if request.method == 'POST':
         newsletter.title = request.values.get('title')
-        newsletter.slugify()
         newsletter.body = request.values.get('body')
         newsletter.number = request.values.get('number')
+        newsletter.slugify()
         newsletter.save()
-
-        if request.values.get('sent') != None and request.values.get('sent') != '':
-            if not newsletter.sent:
-                return send_newsletter(newsletterid)
-            else:
-                newsletter.sentdate = datetime.strptime(request.values.get('sent'), '%Y-%m-%d')
-                newsletter.save()
         return redirect('/admin/newsletter/{}'.format(newsletterid))
     return render_template('edit_newsletter.html', newsletter=newsletter)

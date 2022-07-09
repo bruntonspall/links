@@ -1,5 +1,7 @@
 # -*- coding: UTF-8 -*-
-from models import Newsletter, Link, Settings, Database
+from models.newsletter import Newsletter
+from models.link import Link
+from models.database import Database
 from flask import Blueprint, redirect, request
 from flask_login import login_required
 import json

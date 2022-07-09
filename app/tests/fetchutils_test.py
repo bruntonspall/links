@@ -1,5 +1,5 @@
 import unittest
-from app.fetchutils import notion_richtext_to_markdown
+from fetchutils import notion_richtext_to_markdown
 
 
 class NotionToMDTestCase(unittest.TestCase):

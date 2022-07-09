@@ -1,7 +1,9 @@
 import unittest
-
 from mockfirestore import MockFirestore
-from .models import Newsletter, Link, Database, Settings
+from models.newsletter import Newsletter
+from models.link import Link
+from models.database import Database
+from models.settings import Settings
 from datetime import datetime
 
 

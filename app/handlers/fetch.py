@@ -1,22 +1,19 @@
-from os import environ
-from models import Newsletter, Link, Settings
-from flask import request, render_template, redirect, url_for, Blueprint
+from models.settings import Settings
+from models.link import Link
+from flask import request, render_template, redirect, Blueprint
 import requests
-import json
 import twitter
-import flask.json
 import datetime
 import logging
 from fetchutils import notion_richtext_to_markdown
 from notion_client import Client
-import google.cloud.logging
-
+# import google.cloud.logging
 
 
 fetch = Blueprint('fetch', __name__)
-logging_client = google.cloud.logging.Client()
-logger = logging_client.logger("fetch")
-logging_client.setup_logging()
+# logging_client = google.cloud.logging.Client()
+# logger = logging_client.logger("fetch")
+# logging_client.setup_logging()
 
 
 
@@ -68,26 +65,26 @@ def fetch_pinboard():
     lastfetch = Settings.get('PINBOARD_LAST')
     logging.error("Fetching api with token {}".format(authtoken))
 
-    dt = requests.get('https://api.pinboard.in/v1/posts/update',params={
-    'format':'json',
-    'auth_token':authtoken,
+    dt = requests.get('https://api.pinboard.in/v1/posts/update', params={
+        'format': 'json',
+        'auth_token': authtoken,
     }).json()
     if 'update_time' in dt and dt['update_time'] != lastfetch:
         Settings.set('PINBOARD_LAST', dt['update_time'])
-        d = requests.get('http://api.pinboard.in/v1/posts/all',params={
-            'format':'json',
-            'results':'75',
-            'tag':'newsletter',
-            'auth_token':authtoken
+        d = requests.get('http://api.pinboard.in/v1/posts/all', params={
+            'format': 'json',
+            'results': '75',
+            'tag': 'newsletter',
+            'auth_token': authtoken
         }).json()
         count = 0
         for item in d:
             if not Link.get_by_url(item['href']):
                 Link(
-                url=item['href'],
-                title=item['description'],
-                note=item['extended'],
-                type=0
+                    url=item['href'],
+                    title=item['description'],
+                    note=item['extended'],
+                    type=0
                 ).save()
                 count += 1
     logging.info(f"Processed {count} items")
@@ -131,7 +128,7 @@ def fetch_notion():
 
         if edited > lastimported:  # Has it been touched in Notion since we last ran the import script?
             url = result['properties']['URL']['url']
-            logger.log_struct({"entry": url, "NotionObject": result})
+            # logger.log_struct({"entry": url, "NotionObject": result})
             comment = notion_richtext_to_markdown(result['properties']['Comment']['rich_text'])
             quote = notion_richtext_to_markdown(result['properties']['Quote']['rich_text'])
             title = notion_richtext_to_markdown(result['properties']['Name']['title'])
@@ -191,9 +188,9 @@ def fetch_twitter_favs():
         lastfetch = 0
 
     api = twitter.Api(consumer_key=consumerkey,
-                  consumer_secret=consumersecret,
-                  access_token_key=accesskey,
-                  access_token_secret=accesssecret)
+                      consumer_secret=consumersecret,
+                      access_token_key=accesskey,
+                      access_token_secret=accesssecret)
 
     favs = api.GetFavorites(screen_name='bruntonspall', include_entities=True, count=50, since_id=lastfetch)
     count = 0
@@ -203,10 +200,10 @@ def fetch_twitter_favs():
                 if not u.expanded_url.startswith("https://twitter.com/"):
                     if not Link.get_by_url(u.expanded_url):
                         Link(
-                        url=u.expanded_url,
-                        title=fav.text,
-                        note="Tweet: [https://twitter.com/{}/status{}]()".format(fav.user.screen_name, fav.id),
-                        type=0
+                            url=u.expanded_url,
+                            title=fav.text,
+                            note="Tweet: [https://twitter.com/{}/status{}]()".format(fav.user.screen_name, fav.id),
+                            type=0
                         ).put()
                         count += 1
         Settings.set('TWITTER_LAST', favs[0].id_str)
