@@ -7,7 +7,7 @@ import twitter
 import flask.json
 import datetime
 import logging
-from app.fetchutils import notion_richtext_to_markdown
+from fetchutils import notion_richtext_to_markdown
 from notion_client import Client
 import google.cloud.logging
 
