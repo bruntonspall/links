@@ -1,6 +1,5 @@
 from flask import request, render_template, redirect, Blueprint
 from services import newsletter_service
-from models.newsletter import Newsletter
 from repositories import links_repo, newsletter_repo
 from flask_login import login_required
 

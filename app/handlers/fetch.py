@@ -1,5 +1,5 @@
 from models.link import Link
-from repositories import settings_repo
+from repositories import settings_repo, links_repo
 from flask import request, render_template, redirect, Blueprint
 import requests
 import twitter
@@ -7,14 +7,7 @@ import datetime
 import logging
 from fetchutils import notion_richtext_to_markdown
 from notion_client import Client
-# import google.cloud.logging
-
-
 fetch = Blueprint('fetch', __name__)
-# logging_client = google.cloud.logging.Client()
-# logger = logging_client.logger("fetch")
-# logging_client.setup_logging()
-
 
 
 @fetch.route("/")
@@ -79,13 +72,13 @@ def fetch_pinboard():
         }).json()
         count = 0
         for item in d:
-            if not Link.get_by_url(item['href']):
-                Link(
+            if not links_repo.get_by_url(item['href']):
+                links_repo.save(Link(
                     url=item['href'],
                     title=item['description'],
                     note=item['extended'],
                     type=0
-                ).save()
+                ))
                 count += 1
     logging.info(f"Processed {count} items")
     return redirect("/admin/fetch/")
@@ -134,13 +127,13 @@ def fetch_notion():
             title = notion_richtext_to_markdown(result['properties']['Name']['title'])
             existing = Link.get_by_url(url)
             if not existing:
-                Link(
+                links_repo.save(Link(
                     url=url,
                     title=title,
                     quote=quote,
                     note=comment,
                     type=0
-                ).save()
+                ))
                 count += 1
                 logging.info(f"Creating {name}")
                 tags = result['properties']['Tags']
@@ -152,7 +145,7 @@ def fetch_notion():
             else:
                 # We've seen this before somewhere, so we need to work out whether to update it or not
                 # Never touch live links, or links that are in a newsletter
-                if existing.type == Link.SENT or existing.newsletter:
+                if existing.type == links_repo.SENT or existing.newsletter:
                     logging.info(f"{name} was already sent in newsletter {existing.newsletter}")
                 else:
                     if existing.stored > edited:
@@ -161,7 +154,7 @@ def fetch_notion():
                         existing.title = title
                         existing.quote = quote
                         existing.note = comment
-                        existing.save()
+                        links_repo.save(existing)
                         count += 1
                         tags = result['properties']['Tags']
                         if filter(lambda t: t["name"] == tag, tags["multi_select"]):
@@ -198,13 +191,13 @@ def fetch_twitter_favs():
         for fav in favs:
             for u in fav.urls:
                 if not u.expanded_url.startswith("https://twitter.com/"):
-                    if not Link.get_by_url(u.expanded_url):
-                        Link(
+                    if not links_repo.get_by_url(u.expanded_url):
+                        links_repo.save(Link(
                             url=u.expanded_url,
                             title=fav.text,
                             note="Tweet: [https://twitter.com/{}/status{}]()".format(fav.user.screen_name, fav.id),
                             type=0
-                        ).put()
+                        ))
                         count += 1
         settings_repo.set('TWITTER_LAST', favs[0].id_str)
     return 'Processed {} items'.format(count)
