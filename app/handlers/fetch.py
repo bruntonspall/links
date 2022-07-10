@@ -125,7 +125,7 @@ def fetch_notion():
             comment = notion_richtext_to_markdown(result['properties']['Comment']['rich_text'])
             quote = notion_richtext_to_markdown(result['properties']['Quote']['rich_text'])
             title = notion_richtext_to_markdown(result['properties']['Name']['title'])
-            existing = Link.get_by_url(url)
+            existing = links_repo.get_by_url(url)
             if not existing:
                 links_repo.save(Link(
                     url=url,
@@ -164,7 +164,7 @@ def fetch_notion():
                         notion.pages.update(page_id=result['id'], properties={'Tags': tags, 'Imported': imported})
         else:
             logging.info("Hasn't been edited since importing, so checking if it's gone live")
-            existing = Link.get_by_url(url)
+            existing = links_repo.get_by_url(url)
             if existing:  # This is in the database, is it live?
                 if existing.type == links_repo.SENT and existing.newsletter:
                     newsletter = newsletter_repo.get(existing.newsletter)
