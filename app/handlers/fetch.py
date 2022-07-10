@@ -1,5 +1,5 @@
 from models.link import Link
-from repositories import settings_repo, links_repo
+from repositories import settings_repo, links_repo, newsletter_repo
 from flask import request, render_template, redirect, Blueprint
 import requests
 import twitter
@@ -163,7 +163,16 @@ def fetch_notion():
                         print(f"Updated, so setting Imported to {importtime}")
                         notion.pages.update(page_id=result['id'], properties={'Tags': tags, 'Imported': imported})
         else:
-            logging.info("Hasn't been edited since importing, so skipping")
+            logging.info("Hasn't been edited since importing, so checking if it's gone live")
+            existing = Link.get_by_url(url)
+            if existing:  # This is in the database, is it live?
+                if existing.type == links_repo.SENT and existing.newsletter:
+                    newsletter = newsletter_repo.get(existing.newsletter)
+                    issuetag = "CyberWeekly" + newsletter.number
+                    tags = result['properties']['Tags']
+                    if filter(lambda t: t["name"] == issuetag, tags["multi_select"]):
+                        tags['multi_select'].append({'name': issuetag})
+                    notion.pages.update(page_id=result['id'], properties={'Tags': tags})
 
     settings_repo.set('NOTION_LASTRUN', importtime)
     logging.info(f"Processed {count} items")
