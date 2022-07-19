@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 from flask import request, render_template, redirect, Blueprint
 from services import links_service
-from repositories import links_repo
+from repositories import links_repo, newsletter_repo
 from models.link import Link
 from flask_login import login_required
 import logging
@@ -20,7 +20,10 @@ def show_link(linkid):
 @login_required
 def edit_link(linkid):
     logging.info(f"Getting link {linkid}")
+    newsletter = None
     link = links_service.get(linkid)
+    if link.newsletter:
+        newsletter = newsletter_repo.get(link.newsletter)
     if request.method == 'POST':
         link.title = request.form.get('title', link.title)
         link.quote = request.form.get('quote', link.quote)
@@ -33,7 +36,7 @@ def edit_link(linkid):
 
         links_repo.save(link)
         return redirect('/admin/index')
-    return render_template("form.html", link=link)
+    return render_template("form.html", link=link, newsletter=newsletter)
 
 
 @links.route('/<linkid>/read')

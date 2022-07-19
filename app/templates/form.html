@@ -4,8 +4,7 @@
 Edit a link
 {% endblock %}
 {% block content %}
-{% if link.newsletter %}
-{% set newsletter = link.get_newsletter()%}
+{% if newsletter %}
 <div class="p-4 mb-4 text-sm text-gray-700 bg-yellow-100 rounded-lg" role="alert">
 <p>Seen in <a href="/{{newsletter.slugify()}}">{{newsletter.number}} - {{newsletter.title}}</a></p>
 </div>
