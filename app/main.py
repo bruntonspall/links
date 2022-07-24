@@ -11,7 +11,7 @@ from models.database import Database
 from flask import render_template, request, url_for, redirect
 from flaskext.markdown import Markdown
 
-from repositories import links_repo, newsletter_repo, user_repo
+from repositories import links_repo, newsletter_repo, user_repo, settings_repo
 
 from handlers.admin import admin
 from handlers.newsletter import newsletter
@@ -51,8 +51,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 client = WebApplicationClient(GOOGLE_CLIENT_ID)
-
-ALLOWED_USERS = ["michael@brunton-spall.co.uk", "joel@slash32.co.uk"]
 
 
 # Flask-Login helper to retrieve a user from our db
@@ -135,6 +133,7 @@ def callback():
         return "User email not available or not verified by Google.", 400
 
     # Check whether user is in list of allowed users
+    ALLOWED_USERS = settings_repo.get("ALLOWED_USERS").split(",")
     if users_email not in ALLOWED_USERS:
         return "Users email is not in the allow-list"
 
