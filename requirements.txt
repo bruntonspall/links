@@ -10,7 +10,7 @@ python-dateutil
 google-cloud-firestore
 google-cloud-logging
 mock-firestore
-werkzeug==2.1.2
+werkzeug==2.2.3
 Flask-Login
 gunicorn
 notion-client
