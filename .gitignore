@@ -158,3 +158,4 @@ node_modules
 # Exports
 export
 export.json
+app/static/css/main.css

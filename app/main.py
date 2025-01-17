@@ -9,7 +9,6 @@ from models.newsletter import Newsletter
 from models.link import Link
 from models.database import Database
 from flask import render_template, request, url_for, redirect
-from flaskext.markdown import Markdown
 
 from repositories import links_repo, newsletter_repo, user_repo, settings_repo
 
@@ -27,8 +26,11 @@ from flask_login import (
 )
 from oauthlib.oauth2 import WebApplicationClient
 
+from markupsafe import Markup
+from markdown import markdown
+
+
 app = Flask(__name__)
-Markdown(app)
 app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(24)
 
 
@@ -37,6 +39,9 @@ app.register_blueprint(newsletter, url_prefix='/admin/newsletter')
 app.register_blueprint(links, url_prefix='/admin/link')
 app.register_blueprint(fetch, url_prefix='/admin/fetch')
 
+@app.template_filter('markdown')
+def markup_markdown(text):
+    return Markup(markdown(text))
 
 # Configuration
 GOOGLE_CLIENT_ID = os.environ.get("OAUTH_CLIENTID", None)
@@ -68,6 +73,13 @@ def adminindex():
 def get_google_provider_cfg():
     return requests.get(GOOGLE_DISCOVERY_URL).json()
 
+
+@app.route('/admin/debuglogin')
+def debug_login():
+    if app.config['LOGIN_DEBUG']:
+        user = user_repo.create("testuser", "test@test.com", "Test User", "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80")
+        login_user(user)
+    return redirect("/admin/index")
 
 @app.route("/login")
 def login():
@@ -203,7 +215,6 @@ def import_from_file(fname):
     import json
     data = json.load(open(fname))
     for nl in data['newsletters']:
-        logging.info(u"Parsing {}".format(nl))
         # Change up the sent fields
         if nl['sent']:
             nl['sentdate'] = nl['sent']
@@ -214,12 +225,10 @@ def import_from_file(fname):
         n.slugify()
         newsletter_repo.save(n)
         key = n.key()
-        logging.info(u"Create newsletter {} - {}".format(n.number, n.title))
         for sublink in nl['links']:
             link = Link.from_dict(sublink)
             link.newsletter = key
             links_repo.save(link)
-            logging.info(u"Create link {}".format(link.title))
     for sublink in data['queue']:
         link = Link.from_json(sublink)
         links_repo.save(link)
@@ -237,11 +246,9 @@ def debug():
     from mockfirestore import MockFirestore
     Database.db = MockFirestore()
 
-    @app.before_first_request
-    def login_test_user():
-        user = user_repo.create("testuser", "test@test.com", "Test User", "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80")
-        login_user(user)
     # app.config['LOGIN_DISABLED'] = True
+    app.config['LOGIN_DEBUG'] = True
+
     import os
     if os.path.exists("export.json"):
         import_from_file("export.json")

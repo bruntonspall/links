@@ -14,8 +14,8 @@ RUN npm install
 
 ARG NODE_ENV="production"
 ENV NODE_ENV="${NODE_ENV}" \
-    PATH="${PATH}:/node_modules/.bin" \
-    USER="node"
+  PATH="${PATH}:/node_modules/.bin" \
+  USER="node"
 
 COPY --chown=node:node app /app
 
@@ -23,14 +23,14 @@ RUN npx tailwindcss --minify -i /app/static/src/style.css -o /app/static/css/mai
 
 CMD ["bash"]
 
-FROM python:3.10-slim as build
+FROM python:3.10-slim AS build
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY requirements-dev.txt .
 RUN pip install -r requirements-dev.txt
 
-ENV APP_HOME /app
+ENV APP_HOME=/app
 WORKDIR $APP_HOME
 COPY app ./
 
@@ -39,7 +39,7 @@ ENV PYTHONPATH=/app
 RUN pytest
 
 FROM python:3.10-slim
-ENV APP_HOME /app
+ENV APP_HOME=/app
 WORKDIR $APP_HOME
 COPY --from=build /app ./
 COPY --from=assets /app/static/css/main.css /app/static/css/main.css

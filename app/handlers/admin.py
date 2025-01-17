@@ -66,6 +66,6 @@ def imp():
     for link in data['drafts']:
         links_repo.save(Link.from_dict(link))
     for link in data['readinglist']:
-        links_repo.sve(Link.from_dict(link))
+        links_repo.save(Link.from_dict(link))
 
     return "OK"
