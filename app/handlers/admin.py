@@ -28,7 +28,7 @@ def export():
     }
     for newsletter in newsletter_repo.list():
         news = newsletter.to_dict()
-        news['links'] = [link.to_dict() for link in links_repo.by_newsletter(newsletter.key)]
+        news['links'] = [link.to_dict() for link in links_repo.by_newsletter(newsletter.key())]
         data['newsletters'].append(news)
     for link in links_repo.drafts():
         data['drafts'].append(link.to_dict())
